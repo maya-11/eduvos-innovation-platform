@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { collection, getDocs, updateDoc, doc, query, orderBy } from "firebase/firestore";
@@ -115,7 +115,7 @@ export default function AdminPanel() {
           padding: '2rem',
           textAlign: 'center'
         }}>
-          <h2 style={{ color: '#92400e', marginBottom: '1rem' }}>🔐 Admin Access Required</h2>
+          <h2 style={{ color: '#92400e', marginBottom: '1rem' }}>?? Admin Access Required</h2>
           <p style={{ color: '#92400e', marginBottom: '1rem' }}>
             You need administrator privileges to access this panel.
           </p>
@@ -213,7 +213,7 @@ export default function AdminPanel() {
                       {idea.title}
                     </h3>
                     <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                      By: {idea.authorEmail} • {idea.votesCount} votes
+                      By: {idea.authorEmail} � {idea.votesCount} votes
                     </p>
                   </div>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -302,7 +302,7 @@ export default function AdminPanel() {
                       fontWeight: '500'
                     }}
                   >
-                    View Details →
+                    View Details ?
                   </Link>
                 </div>
               </div>
@@ -512,7 +512,7 @@ export default function AdminPanel() {
               padding: '1.5rem'
             }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>
-                🏆 Most Popular Idea
+                ?? Most Popular Idea
               </h3>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
@@ -557,7 +557,7 @@ export default function AdminPanel() {
                       display: 'inline-block'
                     }}
                   >
-                    View Idea →
+                    View Idea ?
                   </Link>
                 </div>
               </div>

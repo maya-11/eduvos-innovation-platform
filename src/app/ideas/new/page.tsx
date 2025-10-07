@@ -1,138 +1,98 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/useAuth";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { aiAnalysisService, AIAnalysis } from "@/lib/aiAnalysis";
 
 export default function NewIdea() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  
-  const { user, loading: authLoading } = useAuth();
+  const [analyzing, setAnalyzing] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+
+  const { user } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
+  // Analyze idea with AI
+  const analyzeIdea = async () => {
+    if (!title.trim() || !description.trim()) return;
+    
+    setAnalyzing(true);
+    try {
+      const analysis = await aiAnalysisService.analyzeIdea(title, description, tags.split(',').map(t => t.trim()));
+      setAiAnalysis(analysis);
+      setShowAnalysis(true);
+    } catch (error) {
+      console.error("AI analysis failed:", error);
+    } finally {
+      setAnalyzing(false);
     }
-  }, [user, authLoading, router]);
-
-  if (authLoading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <div style={{ fontSize: '1.125rem' }}>Loading...</div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <div style={{ fontSize: '1.125rem' }}>Redirecting to login...</div>
-      </div>
-    );
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
+    if (!user || !title.trim() || !description.trim()) return;
 
+    setLoading(true);
     try {
-      const tagsArray = tags.split(",").map(tag => tag.trim()).filter(tag => tag);
-      
+      // Calculate priority based on AI analysis or default to medium
+      const priority = aiAnalysis 
+        ? aiAnalysisService.calculatePriority(aiAnalysis)
+        : 3;
+
       const ideaData = {
         title: title.trim(),
         description: description.trim(),
         authorId: user.uid,
         authorEmail: user.email,
-        status: "backlog",
+        status: 'backlog',
         votesCount: 0,
-        tags: tagsArray,
-        priority: 1,
+        tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        priority,
+        aiAnalysis: aiAnalysis || null,
+        aiScore: aiAnalysis ? aiAnalysisService.getOverallScore(aiAnalysis) : null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
 
       const docRef = await addDoc(collection(db, "ideas"), ideaData);
       console.log("Document written with ID: ", docRef.id);
-      
-      setSuccess("Idea submitted successfully! Redirecting...");
-      
-      setTimeout(() => {
-        router.push("/ideas");
-      }, 1500);
-      
-    } catch (error: any) {
-      console.error("Full error details:", error);
-      setError("Failed to submit idea: " + error.message);
+      router.push("/ideas");
+    } catch (error) {
+      console.error("Error submitting idea:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  if (!user) {
+    router.push("/login");
+    return null;
+  }
+
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <a href="/ideas" style={{ color: '#2563eb', textDecoration: 'none' }}>? Back to Ideas</a>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', marginTop: '0.5rem' }}>Submit New Idea</h1>
-        <p style={{ color: '#6b7280' }}>Share your innovative idea with the Eduvos community</p>
-      </div>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
+      <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', marginBottom: '2rem' }}>
+        Submit New Idea
+      </h1>
 
-      <form onSubmit={handleSubmit} style={{
-        background: 'white',
-        padding: '1.5rem',
-        borderRadius: '0.5rem',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-      }}>
-        {error && (
-          <div style={{
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#dc2626',
-            padding: '0.75rem 1rem',
-            borderRadius: '0.375rem',
-            marginBottom: '1rem'
-          }}>
-            <strong>Error:</strong> {error}
-          </div>
-        )}
-        
-        {success && (
-          <div style={{
-            background: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            color: '#16a34a',
-            padding: '0.75rem 1rem',
-            borderRadius: '0.375rem',
-            marginBottom: '1rem'
-          }}>
-            <strong>Success!</strong> {success}
-          </div>
-        )}
-
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{
-            display: 'block',
-            fontWeight: '600',
-            marginBottom: '0.5rem',
-            color: '#374151',
-            fontSize: '0.875rem'
-          }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Title Input */}
+        <div>
+          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem', color: '#374151' }}>
             Idea Title *
           </label>
           <input
             type="text"
-            required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            placeholder="What's your innovative idea?"
             style={{
               width: '100%',
               padding: '0.75rem',
@@ -141,25 +101,20 @@ export default function NewIdea() {
               fontSize: '1rem',
               color: '#111827'
             }}
-            placeholder="What's your innovative idea?"
+            required
           />
         </div>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{
-            display: 'block',
-            fontWeight: '600',
-            marginBottom: '0.5rem',
-            color: '#374151',
-            fontSize: '0.875rem'
-          }}>
+        {/* Description Input */}
+        <div>
+          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem', color: '#374151' }}>
             Detailed Description *
           </label>
           <textarea
-            required
-            rows={6}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe your idea in detail. What problem does it solve? How would it work?"
+            rows={6}
             style={{
               width: '100%',
               padding: '0.75rem',
@@ -169,24 +124,20 @@ export default function NewIdea() {
               color: '#111827',
               resize: 'vertical'
             }}
-            placeholder="Describe your idea in detail. What problem does it solve? How would it work?"
+            required
           />
         </div>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{
-            display: 'block',
-            fontWeight: '600',
-            marginBottom: '0.5rem',
-            color: '#374151',
-            fontSize: '0.875rem'
-          }}>
-            Tags
+        {/* Tags Input */}
+        <div>
+          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem', color: '#374151' }}>
+            Tags (comma-separated)
           </label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
+            placeholder="campus, technology, sustainability, education"
             style={{
               width: '100%',
               padding: '0.75rem',
@@ -195,43 +146,121 @@ export default function NewIdea() {
               fontSize: '1rem',
               color: '#111827'
             }}
-            placeholder="technology, education, sustainability (separate with commas)"
           />
-          <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>Add relevant tags to help categorize your idea</p>
         </div>
 
-        <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <a
-              href="/ideas"
-              style={{
-                padding: '0.5rem 1rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                color: '#374151',
-                textDecoration: 'none'
-              }}
-            >
-              Cancel
-            </a>
+        {/* AI Analysis Section */}
+        <div>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
             <button
-              type="submit"
-              disabled={loading}
+              type="button"
+              onClick={analyzeIdea}
+              disabled={analyzing || !title.trim() || !description.trim()}
               style={{
-                padding: '0.5rem 1.5rem',
-                background: '#2563eb',
+                background: '#7c3aed',
                 color: 'white',
+                padding: '0.75rem 1.5rem',
                 border: 'none',
                 borderRadius: '0.375rem',
-                fontSize: '1rem',
-                cursor: 'pointer',
-                opacity: loading ? 0.5 : 1
+                cursor: analyzing ? 'not-allowed' : 'pointer',
+                opacity: (analyzing || !title.trim() || !description.trim()) ? 0.5 : 1,
+                fontWeight: '500'
               }}
             >
-              {loading ? "Submitting..." : "Submit Idea"}
+              {analyzing ? '🤖 Analyzing...' : '🧠 Get AI Analysis'}
             </button>
+            <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+              Get instant feedback on your idea's potential
+            </span>
           </div>
+
+          {showAnalysis && aiAnalysis && (
+            <div style={{
+              background: '#f0f9ff',
+              border: '1px solid #bae6fd',
+              borderRadius: '0.5rem',
+              padding: '1.5rem',
+              marginTop: '1rem'
+            }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0369a1', marginBottom: '1rem' }}>
+                🤖 AI Analysis Results
+              </h3>
+              
+              {/* Overall Score */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{
+                  background: '#10b981',
+                  color: 'white',
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold'
+                }}>
+                  {aiAnalysisService.getOverallScore(aiAnalysis)}%
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827' }}>
+                    Overall Score
+                  </div>
+                  <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                    Confidence: {aiAnalysis.confidence}%
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  📋 Analysis Summary
+                </div>
+                <p style={{ fontSize: '0.875rem', color: '#4b5563', lineHeight: '1.5' }}>
+                  {aiAnalysis.summary}
+                </p>
+              </div>
+
+              {/* Auto-assigned Priority */}
+              <div style={{ 
+                background: '#fef3c7', 
+                border: '1px solid #fcd34d',
+                borderRadius: '0.375rem',
+                padding: '0.75rem',
+                marginTop: '1rem',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: '500', color: '#92400e' }}>
+                  🎯 Auto-assigned Priority: {aiAnalysisService.calculatePriority(aiAnalysis)}/5
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#92400e' }}>
+                  (1 = Highest priority, 5 = Lowest priority)
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            background: '#2563eb',
+            color: 'white',
+            padding: '0.75rem 1.5rem',
+            border: 'none',
+            borderRadius: '0.375rem',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: '1rem',
+            fontWeight: '500',
+            alignSelf: 'flex-start',
+            opacity: loading ? 0.5 : 1
+          }}
+        >
+          {loading ? 'Submitting...' : 'Submit Idea'}
+        </button>
       </form>
     </div>
   );
