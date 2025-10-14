@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider, updateProfile } from "firebase/auth";
 
 interface UserIdea {
   id: string;
@@ -16,12 +16,12 @@ interface UserIdea {
 }
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   
   const [userIdeas, setUserIdeas] = useState<UserIdea[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   
   // Set active tab based on URL parameter or default to 'profile'
   const initialTab = searchParams.get('tab') as 'profile' | 'ideas' | 'security' || 'profile';
@@ -30,6 +30,8 @@ export default function Profile() {
   // Profile form state
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileMessage, setProfileMessage] = useState("");
   
   // Security form state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -39,44 +41,65 @@ export default function Profile() {
   const [passwordMessage, setPasswordMessage] = useState("");
 
   useEffect(() => {
-    if (!user) {
+    console.log("🔐 Auth state:", { user, authLoading });
+    
+    // Only redirect if auth is done loading and there's no user
+    if (!authLoading && !user) {
+      console.log("🚫 No user found, redirecting to login");
       router.push("/login");
       return;
     }
 
-    const fetchUserData = async () => {
-      try {
-        // Fetch user's ideas
-        const ideasQuery = query(
-          collection(db, "ideas"),
-          where("authorId", "==", user.uid),
-          orderBy("createdAt", "desc")
-        );
-        const querySnapshot = await getDocs(ideasQuery);
-        const ideasData: UserIdea[] = [];
-        
-        querySnapshot.forEach((doc) => {
-          ideasData.push({
-            id: doc.id,
-            ...doc.data()
-          } as UserIdea);
-        });
-        
-        setUserIdeas(ideasData);
-        
-        // Set form values
-        setDisplayName(user.displayName || "");
-        setEmail(user.email || "");
-        
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // If we have a user, fetch their data
+    if (user && !authLoading) {
+      console.log("👤 User found, fetching data...");
+      fetchUserData();
+    }
+  }, [user, authLoading, router]);
 
-    fetchUserData();
-  }, [user, router]);
+  const fetchUserData = async () => {
+    try {
+      console.log("📥 Fetching user ideas...");
+      // Fetch user's ideas - using simpler query that doesn't require composite index
+      const ideasQuery = query(
+        collection(db, "ideas"),
+        where("authorId", "==", user!.uid)
+        // Removed orderBy to avoid index requirement for demo
+      );
+      const querySnapshot = await getDocs(ideasQuery);
+      const ideasData: UserIdea[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        ideasData.push({
+          id: doc.id,
+          title: data.title || "Untitled Idea",
+          status: data.status || "backlog",
+          votesCount: data.votesCount || 0,
+          createdAt: data.createdAt
+        } as UserIdea);
+      });
+      
+      // Sort locally by createdAt if available
+      ideasData.sort((a, b) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(0);
+        return dateB.getTime() - dateA.getTime(); // Descending order
+      });
+      
+      setUserIdeas(ideasData);
+      
+      // Set form values
+      setDisplayName(user!.displayName || "");
+      setEmail(user!.email || "");
+      
+      console.log("✅ User data loaded successfully, ideas found:", ideasData.length);
+    } catch (error) {
+      console.error("❌ Error fetching user data:", error);
+    } finally {
+      setDataLoading(false);
+    }
+  };
 
   // Update URL when tab changes
   useEffect(() => {
@@ -88,6 +111,40 @@ export default function Profile() {
     }
     window.history.replaceState({}, '', url.toString());
   }, [activeTab]);
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!displayName.trim()) {
+      setProfileMessage("Display name cannot be empty");
+      return;
+    }
+
+    setProfileLoading(true);
+    setProfileMessage("");
+
+    try {
+      if (user) {
+        console.log("📝 Updating profile...");
+        // Update user profile
+        await updateProfile(user, {
+          displayName: displayName.trim()
+        });
+        
+        setProfileMessage("✅ Profile updated successfully!");
+        
+        // Refresh the page to show updated display name
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (error: any) {
+      console.error("❌ Error updating profile:", error);
+      setProfileMessage(`Error: ${error.message}`);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,6 +164,7 @@ export default function Profile() {
 
     try {
       if (user && user.email) {
+        console.log("🔐 Updating password...");
         // Reauthenticate user
         const credential = EmailAuthProvider.credential(user.email, currentPassword);
         await reauthenticateWithCredential(user, credential);
@@ -114,39 +172,51 @@ export default function Profile() {
         // Update password
         await updatePassword(user, newPassword);
         
-        setPasswordMessage("? Password updated successfully!");
+        setPasswordMessage("✅ Password updated successfully!");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
       }
     } catch (error: any) {
-      console.error("Error updating password:", error);
+      console.error("❌ Error updating password:", error);
       setPasswordMessage(`Error: ${error.message}`);
     } finally {
       setPasswordLoading(false);
     }
   };
 
-  if (loading) {
+  // Show loading while auth is being checked
+  if (authLoading) {
     return (
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.125rem' }}>Loading profile...</div>
+          <div style={{ fontSize: '1.125rem' }}>Checking authentication...</div>
         </div>
       </div>
     );
   }
 
+  // Show loading while user data is being fetched
+  if (dataLoading && user) {
+    return (
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.125rem' }}>Loading your profile...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if no user (will redirect)
   if (!user) {
     return null;
   }
 
-  // User stats
+  // User stats - removed avg votes as requested
   const userStats = {
     totalIdeas: userIdeas.length,
     implementedIdeas: userIdeas.filter(idea => idea.status === 'implemented').length,
-    totalVotes: userIdeas.reduce((sum, idea) => sum + idea.votesCount, 0),
-    avgVotes: userIdeas.length > 0 ? (userIdeas.reduce((sum, idea) => sum + idea.votesCount, 0) / userIdeas.length).toFixed(1) : '0'
+    totalVotes: userIdeas.reduce((sum, idea) => sum + idea.votesCount, 0)
   };
 
   return (
@@ -187,7 +257,7 @@ export default function Profile() {
                 fontWeight: 'bold',
                 margin: '0 auto 1rem'
               }}>
-                {user.email?.charAt(0).toUpperCase()}
+                {(user.displayName || user.email?.charAt(0) || 'U').toUpperCase()}
               </div>
               <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.25rem' }}>
                 {user.displayName || 'User'}
@@ -197,10 +267,10 @@ export default function Profile() {
               </p>
             </div>
 
-            {/* Stats */}
+            {/* Stats - removed avg votes */}
             <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(2, 1fr)', 
+              gridTemplateColumns: 'repeat(3, 1fr)', 
               gap: '0.75rem',
               marginBottom: '1.5rem'
             }}>
@@ -221,12 +291,6 @@ export default function Profile() {
                   {userStats.totalVotes}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Votes</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#7c3aed' }}>
-                  {userStats.avgVotes}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Avg/idea</div>
               </div>
             </div>
 
@@ -254,7 +318,11 @@ export default function Profile() {
             </nav>
 
             <button
-              onClick={logout}
+              onClick={async () => {
+                console.log("🚪 Logging out...");
+                await logout();
+                router.push("/login");
+              }}
               style={{
                 background: 'transparent',
                 color: '#dc2626',
@@ -287,7 +355,7 @@ export default function Profile() {
                 Profile Information
               </h2>
               
-              <form style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 <div>
                   <label style={{
                     display: 'block',
@@ -327,36 +395,52 @@ export default function Profile() {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     style={{
                       width: '100%',
                       padding: '0.75rem',
                       border: '1px solid #d1d5db',
                       borderRadius: '0.375rem',
                       fontSize: '1rem',
-                      color: '#111827'
+                      color: '#111827',
+                      background: '#f9fafb',
+                      cursor: 'not-allowed'
                     }}
                     disabled
                   />
                   <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
-                    Email cannot be changed in this demo version
+                    Email cannot be changed for security reasons
                   </p>
                 </div>
 
+                {profileMessage && (
+                  <div style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '0.375rem',
+                    background: profileMessage.includes('✅') ? '#f0fdf4' : '#fef2f2',
+                    border: `1px solid ${profileMessage.includes('✅') ? '#bbf7d0' : '#fecaca'}`,
+                    color: profileMessage.includes('✅') ? '#16a34a' : '#dc2626',
+                    fontSize: '0.875rem'
+                  }}>
+                    {profileMessage}
+                  </div>
+                )}
+
                 <button
                   type="submit"
+                  disabled={profileLoading}
                   style={{
                     background: '#2563eb',
                     color: 'white',
                     padding: '0.75rem 1.5rem',
                     border: 'none',
                     borderRadius: '0.375rem',
-                    cursor: 'pointer',
+                    cursor: profileLoading ? 'not-allowed' : 'pointer',
                     fontWeight: '500',
-                    alignSelf: 'flex-start'
+                    alignSelf: 'flex-start',
+                    opacity: profileLoading ? 0.5 : 1
                   }}
                 >
-                  Update Profile
+                  {profileLoading ? 'Updating...' : 'Update Profile'}
                 </button>
               </form>
             </div>
@@ -402,7 +486,8 @@ export default function Profile() {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      background: 'white'
+                      background: 'white',
+                      transition: 'all 0.2s ease'
                     }}>
                       <div style={{ flex: 1 }}>
                         <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
@@ -426,10 +511,10 @@ export default function Profile() {
                             fontWeight: '500',
                             textTransform: 'capitalize'
                           }}>
-                            {idea.status}
+                            {idea.status.replace('-', ' ')}
                           </span>
                           <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                            {idea.votesCount} votes
+                            {idea.votesCount} {idea.votesCount === 1 ? 'vote' : 'votes'}
                           </span>
                           <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
                             {idea.createdAt?.toDate?.().toLocaleDateString() || 'Recently'}
@@ -444,10 +529,22 @@ export default function Profile() {
                           fontWeight: '500',
                           fontSize: '0.875rem',
                           whiteSpace: 'nowrap',
-                          marginLeft: '1rem'
+                          marginLeft: '1rem',
+                          padding: '0.5rem 1rem',
+                          border: '1px solid #2563eb',
+                          borderRadius: '0.375rem',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#2563eb';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.color = '#2563eb';
                         }}
                       >
-                        View Details ?
+                        View Details →
                       </a>
                     </div>
                   ))}
@@ -551,9 +648,9 @@ export default function Profile() {
                   <div style={{
                     padding: '0.75rem 1rem',
                     borderRadius: '0.375rem',
-                    background: passwordMessage.includes('?') ? '#f0fdf4' : '#fef2f2',
-                    border: `1px solid ${passwordMessage.includes('?') ? '#bbf7d0' : '#fecaca'}`,
-                    color: passwordMessage.includes('?') ? '#16a34a' : '#dc2626',
+                    background: passwordMessage.includes('✅') ? '#f0fdf4' : '#fef2f2',
+                    border: `1px solid ${passwordMessage.includes('✅') ? '#bbf7d0' : '#fecaca'}`,
+                    color: passwordMessage.includes('✅') ? '#16a34a' : '#dc2626',
                     fontSize: '0.875rem'
                   }}>
                     {passwordMessage}
