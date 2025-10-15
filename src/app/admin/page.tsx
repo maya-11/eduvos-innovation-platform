@@ -199,13 +199,13 @@ export default function AdminPanel() {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-eduvos-deep via-blue-900/60 to-purple-900/80" />
-        <div className="card-glass p-8 text-center relative z-10 max-w-md">
-          <div className="text-6xl mb-4">🔐</div>
-          <h2 className="text-2xl font-bold text-white mb-4">Admin Access Required</h2>
-          <p className="text-gray-300 mb-6">
+        <div className="card-glass p-6 sm:p-8 text-center relative z-10 max-w-full sm:max-w-md w-full">
+          <div className="text-5xl sm:text-6xl mb-4">🔐</div>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Admin Access Required</h2>
+          <p className="text-gray-300 mb-6 text-sm sm:text-base">
             You need administrator privileges to access this panel.
           </p>
-          <Link href="/login" className="bg-eduvos-electric text-white px-6 py-3 rounded-xl hover:bg-blue-600 transition-colors">
+          <Link href="/login" className="bg-eduvos-electric text-white px-4 py-2 sm:px-6 sm:py-3 rounded-xl hover:bg-blue-600 transition-colors text-sm sm:text-base">
             Login as Admin
           </Link>
         </div>
@@ -217,9 +217,9 @@ export default function AdminPanel() {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-eduvos-deep via-blue-900/60 to-purple-900/80" />
-        <div className="card-glass p-8 text-center relative z-10">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-eduvos-electric mx-auto mb-4"></div>
-          <div className="text-xl text-white">Loading admin dashboard...</div>
+        <div className="card-glass p-6 sm:p-8 text-center relative z-10 w-full max-w-full sm:max-w-md">
+          <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-eduvos-electric mx-auto mb-4"></div>
+          <div className="text-lg sm:text-xl text-white">Loading admin dashboard...</div>
         </div>
       </div>
     );
@@ -267,7 +267,7 @@ export default function AdminPanel() {
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={`node-${i}`}
-            className="absolute w-4 h-4 bg-gradient-to-r from-eduvos-electric to-eduvos-innovation rounded-full shadow-lg shadow-eduvos-electric/50"
+            className="absolute w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-eduvos-electric to-eduvos-innovation rounded-full shadow-lg shadow-eduvos-electric/50"
             style={{
               left: `${10 + (i * 12)}%`,
               top: `${20 + Math.sin(i) * 30}%`,
@@ -290,12 +290,12 @@ export default function AdminPanel() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="card-glass m-6 mb-8"
+          className="card-glass m-2 sm:m-4 md:m-6 mb-4 sm:mb-8"
         >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 sm:p-6">
             <div>
               <motion.h1 
-                className="text-4xl font-bold text-white mb-2 font-playfair"
+                className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2 font-playfair"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
@@ -303,7 +303,7 @@ export default function AdminPanel() {
                 Admin <span className="text-gradient">Dashboard</span>
               </motion.h1>
               <motion.p 
-                className="text-gray-300"
+                className="text-gray-300 text-sm sm:text-base"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
@@ -316,26 +316,26 @@ export default function AdminPanel() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex items-center gap-4 mt-4 md:mt-0"
+              className="flex items-center gap-2 sm:gap-4 mt-3 sm:mt-4 md:mt-0"
             >
-              <div className="flex items-center gap-2 text-gray-300">
+              <div className="flex items-center gap-2 text-gray-300 text-xs sm:text-base">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 <span>System Online</span>
               </div>
-              <div className="px-3 py-1 bg-eduvos-innovation/20 text-eduvos-innovation rounded-full text-sm border border-eduvos-innovation/30">
+              <div className="px-2 py-0.5 sm:px-3 sm:py-1 bg-eduvos-innovation/20 text-eduvos-innovation rounded-full text-xs sm:text-sm border border-eduvos-innovation/30">
                 AI Active
               </div>
             </motion.div>
           </div>
         </motion.div>
 
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-2 sm:px-4 md:px-6">
           {/* Stats Overview */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="grid grid-cols-2 lg:grid-cols-6 gap-6 mb-8"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-8"
           >
             {[
               { label: 'Total Ideas', value: analytics.totalIdeas, icon: '💡', color: 'from-blue-500 to-cyan-500' },
@@ -351,36 +351,36 @@ export default function AdminPanel() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.6 + index * 0.1 }}
                 whileHover={{ y: -5, scale: 1.02 }}
-                className="card-glass p-6 rounded-2xl relative overflow-hidden group"
+                className="card-glass p-3 sm:p-4 md:p-6 rounded-2xl relative overflow-hidden group"
               >
                 {/* Animated background gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
                 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-2xl">{stat.icon}</div>
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="text-xl sm:text-2xl">{stat.icon}</div>
                     <motion.div
                       animate={{ rotate: [0, 10, -10, 0] }}
                       transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}
-                      className="text-2xl opacity-50"
+                      className="text-xl sm:text-2xl opacity-50"
                     >
                       📊
                     </motion.div>
                   </div>
-                  <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-gray-300 text-sm">{stat.label}</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-white mb-0.5 sm:mb-1">{stat.value}</div>
+                  <div className="text-gray-300 text-xs sm:text-sm">{stat.label}</div>
                 </div>
               </motion.div>
             ))}
           </motion.div>
 
           {/* Tabs */}
-          <div className="flex gap-1 mb-8 card-glass p-2 rounded-2xl">
+          <div className="flex gap-1 mb-4 sm:mb-8 card-glass p-1 sm:p-2 rounded-2xl flex-wrap">
             {(['overview', 'ideas', 'users', 'analytics'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-4 px-6 rounded-xl text-center transition-all font-medium ${
+                className={`flex-1 py-2 sm:py-4 px-2 sm:px-6 rounded-xl text-center transition-all font-medium text-xs sm:text-base ${
                   activeTab === tab 
                     ? 'bg-eduvos-electric text-white shadow-lg shadow-eduvos-electric/25' 
                     : 'text-gray-300 hover:text-white hover:bg-white/10'
@@ -398,42 +398,42 @@ export default function AdminPanel() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-8"
+              className="space-y-6 sm:space-y-8"
             >
 
               {/* OVERVIEW TAB */}
               {activeTab === 'overview' && (
-                <div className="grid lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
                   {/* Left Column - Charts & Analytics */}
-                  <div className="lg:col-span-2 space-y-8">
+                  <div className="lg:col-span-2 space-y-4 sm:space-y-8">
                     {/* Faculty Performance */}
                     <motion.div
                       initial={{ opacity: 0, x: -30 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="card-glass p-6 rounded-2xl"
+                      className="card-glass p-4 sm:p-6 rounded-2xl"
                     >
-                      <h2 className="text-2xl font-bold text-white mb-6">Faculty Innovation Performance</h2>
-                      <div className="space-y-4">
+                      <h2 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">Faculty Innovation Performance</h2>
+                      <div className="space-y-2 sm:space-y-4">
                         {facultyData.map((facultyItem, index) => (
                           <motion.div
                             key={facultyItem.faculty}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 group hover:border-eduvos-innovation transition-colors"
+                            className="flex items-center justify-between p-2 sm:p-4 bg-white/5 rounded-xl border border-white/10 group hover:border-eduvos-innovation transition-colors"
                           >
-                            <div className="flex items-center gap-4">
-                              <div className={`w-12 h-12 bg-gradient-to-r ${facultyItem.color} rounded-xl flex items-center justify-center text-white font-bold text-lg`}>
+                            <div className="flex items-center gap-2 sm:gap-4">
+                              <div className={`w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-r ${facultyItem.color} rounded-xl flex items-center justify-center text-white font-bold text-base sm:text-lg`}>
                                 {facultyItem.faculty[0]}
                               </div>
                               <div>
-                                <div className="font-semibold text-white">{facultyItem.faculty}</div>
-                                <div className="text-gray-400 text-sm">{facultyItem.ideas} ideas submitted</div>
+                                <div className="font-semibold text-white text-sm sm:text-base">{facultyItem.faculty}</div>
+                                <div className="text-gray-400 text-xs sm:text-sm">{facultyItem.ideas} ideas submitted</div>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="font-bold text-white">{facultyItem.implemented} implemented</div>
-                              <div className="text-gray-400 text-sm">
+                              <div className="font-bold text-white text-sm sm:text-base">{facultyItem.implemented} implemented</div>
+                              <div className="text-gray-400 text-xs sm:text-sm">
                                 {Math.round((facultyItem.implemented / facultyItem.ideas) * 100)}% success rate
                               </div>
                             </div>
@@ -447,27 +447,27 @@ export default function AdminPanel() {
                       initial={{ opacity: 0, x: -30 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="card-glass p-6 rounded-2xl"
+                      className="card-glass p-4 sm:p-6 rounded-2xl"
                     >
-                      <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                      <h2 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
                         <span>🤖</span> AI Predictive Insights
                       </h2>
-                      <div className="grid md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
                         <motion.div
                           whileHover={{ scale: 1.02 }}
-                          className="p-4 bg-gradient-to-br from-eduvos-innovation/10 to-eduvos-electric/10 rounded-xl border border-eduvos-innovation/20"
+                          className="p-2 sm:p-4 bg-gradient-to-br from-eduvos-innovation/10 to-eduvos-electric/10 rounded-xl border border-eduvos-innovation/20"
                         >
-                          <div className="text-lg font-semibold text-white mb-2">📈 Trending Topics</div>
-                          <div className="text-gray-300 text-sm">
+                          <div className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">📈 Trending Topics</div>
+                          <div className="text-gray-300 text-xs sm:text-sm">
                             Sustainability and AI projects show 40% higher implementation rates
                           </div>
                         </motion.div>
                         <motion.div
                           whileHover={{ scale: 1.02 }}
-                          className="p-4 bg-gradient-to-br from-eduvos-success/10 to-emerald-400/10 rounded-xl border border-eduvos-success/20"
+                          className="p-2 sm:p-4 bg-gradient-to-br from-eduvos-success/10 to-emerald-400/10 rounded-xl border border-eduvos-success/20"
                         >
-                          <div className="text-lg font-semibold text-white mb-2">🎯 Peak Innovation</div>
-                          <div className="text-gray-300 text-sm">
+                          <div className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">🎯 Peak Innovation</div>
+                          <div className="text-gray-300 text-xs sm:text-sm">
                             Mid-semester weeks show 65% higher idea submission rates
                           </div>
                         </motion.div>
@@ -476,15 +476,15 @@ export default function AdminPanel() {
                   </div>
 
                   {/* Right Column - Activity & Quick Actions */}
-                  <div className="space-y-8">
+                  <div className="space-y-4 sm:space-y-8">
                     {/* Recent Activity */}
                     <motion.div
                       initial={{ opacity: 0, x: 30 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="card-glass p-6 rounded-2xl"
+                      className="card-glass p-4 sm:p-6 rounded-2xl"
                     >
-                      <h2 className="text-2xl font-bold text-white mb-6">Recent Activity</h2>
-                      <div className="space-y-4">
+                      <h2 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">Recent Activity</h2>
+                      <div className="space-y-2 sm:space-y-4">
                         <AnimatePresence>
                           {recentActivity.map((activity) => (
                             <motion.div
@@ -492,17 +492,17 @@ export default function AdminPanel() {
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -20 }}
-                              className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10 group hover:border-eduvos-innovation transition-colors"
+                              className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-white/5 border border-white/10 group hover:border-eduvos-innovation transition-colors"
                             >
-                              <div className={`w-2 h-2 rounded-full mt-2 ${
+                              <div className={`w-2 h-2 rounded-full mt-1 sm:mt-2 ${
                                 activity.type === 'submission' ? 'bg-blue-400' :
                                 activity.type === 'analysis' ? 'bg-purple-400' :
                                 activity.type === 'milestone' ? 'bg-green-400' :
                                 activity.type === 'approval' ? 'bg-yellow-400' : 'bg-gray-400'
                               }`} />
                               <div className="flex-1">
-                                <div className="text-white font-medium">{activity.user}</div>
-                                <div className="text-gray-400 text-sm">{activity.action}</div>
+                                <div className="text-white font-medium text-xs sm:text-base">{activity.user}</div>
+                                <div className="text-gray-400 text-xs sm:text-sm">{activity.action}</div>
                                 <div className="text-gray-500 text-xs">{activity.time}</div>
                               </div>
                             </motion.div>
@@ -516,10 +516,10 @@ export default function AdminPanel() {
                       initial={{ opacity: 0, x: 30 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="card-glass p-6 rounded-2xl"
+                      className="card-glass p-4 sm:p-6 rounded-2xl"
                     >
-                      <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
-                      <div className="space-y-3">
+                      <h2 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">Quick Actions</h2>
+                      <div className="space-y-2 sm:space-y-3">
                         {[
                           { icon: '👁️', label: 'Review Pending Ideas', action: () => setActiveTab('ideas') },
                           { icon: '📊', label: 'Generate Reports', action: () => console.log('Reports') },
@@ -531,13 +531,13 @@ export default function AdminPanel() {
                             whileHover={{ scale: 1.02, x: 5 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={action.action}
-                            className="w-full flex items-center gap-3 p-3 text-left rounded-xl bg-white/5 border border-white/10 hover:border-eduvos-innovation hover:bg-eduvos-innovation/10 transition-all group"
+                            className="w-full flex items-center gap-2 sm:gap-3 p-2 sm:p-3 text-left rounded-xl bg-white/5 border border-white/10 hover:border-eduvos-innovation hover:bg-eduvos-innovation/10 transition-all group"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 + index * 0.1 }}
                           >
-                            <span className="text-xl group-hover:scale-110 transition-transform">{action.icon}</span>
-                            <span className="text-white font-medium">{action.label}</span>
+                            <span className="text-lg sm:text-xl group-hover:scale-110 transition-transform">{action.icon}</span>
+                            <span className="text-white font-medium text-xs sm:text-base">{action.label}</span>
                             <span className="ml-auto text-gray-400 group-hover:text-eduvos-innovation">→</span>
                           </motion.button>
                         ))}
@@ -549,10 +549,10 @@ export default function AdminPanel() {
                       initial={{ opacity: 0, x: 30 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="card-glass p-6 rounded-2xl"
+                      className="card-glass p-4 sm:p-6 rounded-2xl"
                     >
-                      <h2 className="text-2xl font-bold text-white mb-6">System Health</h2>
-                      <div className="space-y-4">
+                      <h2 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">System Health</h2>
+                      <div className="space-y-2 sm:space-y-4">
                         {systemHealth.map((service, index) => (
                           <motion.div
                             key={service.service}
@@ -561,14 +561,14 @@ export default function AdminPanel() {
                             transition={{ delay: 0.5 + index * 0.1 }}
                             className="flex items-center justify-between"
                           >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
                               <div className={`w-2 h-2 rounded-full ${
                                 service.status === 'optimal' ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'
                               }`} />
-                              <span className="text-white">{service.service}</span>
+                              <span className="text-white text-xs sm:text-base">{service.service}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <div className="w-12 sm:w-20 h-2 bg-white/10 rounded-full overflow-hidden">
                                 <motion.div
                                   initial={{ width: 0 }}
                                   animate={{ width: `${service.value}%` }}
@@ -578,7 +578,7 @@ export default function AdminPanel() {
                                   }`}
                                 />
                               </div>
-                              <span className="text-gray-400 text-sm w-8">{service.value}%</span>
+                              <span className="text-gray-400 text-xs sm:text-sm w-6 sm:w-8">{service.value}%</span>
                             </div>
                           </motion.div>
                         ))}
@@ -590,14 +590,14 @@ export default function AdminPanel() {
 
               {/* IDEAS TAB - Real Data */}
               {activeTab === 'ideas' && (
-                <div className="card-glass p-6 rounded-2xl">
-                  <h2 className="text-2xl font-bold text-white mb-6">Idea Management ({ideas.length})</h2>
-                  <div className="space-y-4">
+                <div className="card-glass p-3 sm:p-6 rounded-2xl">
+                  <h2 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">Idea Management ({ideas.length})</h2>
+                  <div className="space-y-3 sm:space-y-4">
                     {ideas.length === 0 ? (
-                      <div className="text-center py-12 text-gray-400">
-                        <div className="text-6xl mb-4">💡</div>
-                        <p className="text-xl">No ideas submitted yet</p>
-                        <p className="text-sm mt-2">Ideas will appear here once users start submitting them</p>
+                      <div className="text-center py-8 sm:py-12 text-gray-400">
+                        <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">💡</div>
+                        <p className="text-lg sm:text-xl">No ideas submitted yet</p>
+                        <p className="text-xs sm:text-sm mt-1 sm:mt-2">Ideas will appear here once users start submitting them</p>
                       </div>
                     ) : (
                       ideas.map((idea) => (
@@ -605,17 +605,17 @@ export default function AdminPanel() {
                           key={idea.id}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="card-glass p-6 rounded-2xl border border-white/10 hover:border-eduvos-innovation/30 transition-colors"
+                          className="card-glass p-3 sm:p-6 rounded-2xl border border-white/10 hover:border-eduvos-innovation/30 transition-colors"
                         >
-                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 sm:gap-4 mb-2 sm:mb-4">
                             <div className="flex-1">
-                              <h3 className="text-xl font-semibold text-white mb-2">{idea.title}</h3>
-                              <p className="text-gray-400 text-sm">
+                              <h3 className="text-base sm:text-xl font-semibold text-white mb-1 sm:mb-2">{idea.title}</h3>
+                              <p className="text-gray-400 text-xs sm:text-sm">
                                 By: {idea.authorEmail} • {idea.votesCount} votes • {idea.createdAt?.toDate?.().toLocaleDateString() || 'Recently'}
                               </p>
                             </div>
-                            <div className="flex gap-3 items-center">
-                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            <div className="flex gap-2 sm:gap-3 items-center">
+                              <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${
                                 idea.status === 'implemented' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
                                 idea.status === 'in-progress' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
                                 idea.status === 'validated' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
@@ -627,18 +627,18 @@ export default function AdminPanel() {
                             </div>
                           </div>
 
-                          <p className="text-gray-300 mb-4 line-clamp-2">
+                          <p className="text-gray-300 mb-2 sm:mb-4 line-clamp-2 text-xs sm:text-base">
                             {idea.description}
                           </p>
 
                           {/* Admin Controls */}
-                          <div className="flex flex-wrap gap-4 items-center">
-                            <div className="flex items-center gap-2">
-                              <label className="text-gray-400 text-sm">Status:</label>
+                          <div className="flex flex-wrap gap-2 sm:gap-4 items-center">
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <label className="text-gray-400 text-xs sm:text-sm">Status:</label>
                               <select
                                 value={idea.status}
                                 onChange={(e) => updateIdeaStatus(idea.id, e.target.value as Idea['status'])}
-                                className="bg-black/30 border border-gray-600 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:border-eduvos-electric"
+                                className="bg-black/30 border border-gray-600 rounded-lg px-2 sm:px-3 py-0.5 sm:py-1 text-white text-xs sm:text-sm focus:outline-none focus:border-eduvos-electric"
                               >
                                 <option value="backlog">Backlog</option>
                                 <option value="validated">Validated</option>
@@ -648,12 +648,12 @@ export default function AdminPanel() {
                               </select>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                              <label className="text-gray-400 text-sm">Priority:</label>
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <label className="text-gray-400 text-xs sm:text-sm">Priority:</label>
                               <select
                                 value={idea.priority || 1}
                                 onChange={(e) => updateIdeaPriority(idea.id, parseInt(e.target.value))}
-                                className="bg-black/30 border border-gray-600 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:border-eduvos-electric"
+                                className="bg-black/30 border border-gray-600 rounded-lg px-2 sm:px-3 py-0.5 sm:py-1 text-white text-xs sm:text-sm focus:outline-none focus:border-eduvos-electric"
                               >
                                 <option value="1">Low</option>
                                 <option value="2">Medium</option>
@@ -664,7 +664,7 @@ export default function AdminPanel() {
 
                             <Link 
                               href={`/ideas/${idea.id}`}
-                              className="text-eduvos-electric hover:text-eduvos-accent text-sm font-medium ml-auto"
+                              className="text-eduvos-electric hover:text-eduvos-accent text-xs sm:text-sm font-medium ml-auto"
                             >
                               View Details →
                             </Link>
@@ -678,18 +678,18 @@ export default function AdminPanel() {
 
               {/* USERS TAB - Real Count */}
               {activeTab === 'users' && (
-                <div className="card-glass p-6 rounded-2xl">
-                  <h2 className="text-2xl font-bold text-white mb-6">User Management ({users.length})</h2>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="card-glass p-3 sm:p-6 rounded-2xl">
+                  <h2 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">User Management ({users.length})</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                     {users.map((userItem) => (
                       <motion.div
                         key={userItem.id}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="card-glass p-6 rounded-2xl border border-white/10 hover:border-eduvos-innovation/30 transition-colors"
+                        className="card-glass p-3 sm:p-6 rounded-2xl border border-white/10 hover:border-eduvos-innovation/30 transition-colors"
                       >
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg ${
+                        <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-4">
+                          <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-bold text-base sm:text-lg ${
                             userItem.role === 'admin' ? 'bg-gradient-to-r from-red-500 to-pink-500' :
                             userItem.role === 'manager' ? 'bg-gradient-to-r from-purple-500 to-pink-500' :
                             'bg-gradient-to-r from-blue-500 to-cyan-500'
@@ -697,12 +697,12 @@ export default function AdminPanel() {
                             {userItem.email[0].toUpperCase()}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold text-white truncate">{userItem.email}</h3>
-                            <p className="text-gray-400 text-sm">{userItem.faculty}</p>
+                            <h3 className="font-semibold text-white truncate text-xs sm:text-base">{userItem.email}</h3>
+                            <p className="text-gray-400 text-xs sm:text-sm">{userItem.faculty}</p>
                           </div>
                         </div>
                         
-                        <div className="flex justify-between items-center text-sm">
+                        <div className="flex justify-between items-center text-xs sm:text-sm">
                           <span className={`px-2 py-1 rounded-full ${
                             userItem.role === 'admin' ? 'bg-red-500/20 text-red-300' :
                             userItem.role === 'manager' ? 'bg-purple-500/20 text-purple-300' :
@@ -720,16 +720,16 @@ export default function AdminPanel() {
 
               {/* ANALYTICS TAB - Real + Enhanced Data */}
               {activeTab === 'analytics' && (
-                <div className="space-y-8">
+                <div className="space-y-4 sm:space-y-8">
                   {/* Status Distribution */}
-                  <div className="card-glass p-6 rounded-2xl">
-                    <h3 className="text-2xl font-bold text-white mb-6">Ideas by Status</h3>
-                    <div className="space-y-4">
+                  <div className="card-glass p-3 sm:p-6 rounded-2xl">
+                    <h3 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">Ideas by Status</h3>
+                    <div className="space-y-2 sm:space-y-4">
                       {Object.entries(analytics.ideasByStatus).map(([status, count]) => (
-                        <div key={status} className="flex items-center justify-between">
-                          <span className="text-white capitalize min-w-32">{status}</span>
-                          <div className="flex items-center gap-4 flex-1 max-w-md">
-                            <div className="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
+                        <div key={status} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                          <span className="text-white capitalize min-w-24 text-xs sm:text-base">{status}</span>
+                          <div className="flex items-center gap-2 flex-1 max-w-full sm:max-w-md">
+                            <div className="flex-1 bg-white/10 rounded-full h-2 sm:h-3 overflow-hidden">
                               <div 
                                 className={`h-full rounded-full transition-all duration-1000 ${
                                   status === 'implemented' ? 'bg-green-500' :
@@ -740,7 +740,7 @@ export default function AdminPanel() {
                                 style={{ width: `${(count / analytics.totalIdeas) * 100}%` }}
                               />
                             </div>
-                            <span className="text-gray-300 min-w-20 text-right">
+                            <span className="text-gray-300 min-w-12 sm:min-w-20 text-right text-xs sm:text-base">
                               {count} ({Math.round((count / analytics.totalIdeas) * 100)}%)
                             </span>
                           </div>
@@ -751,13 +751,13 @@ export default function AdminPanel() {
 
                   {/* Most Popular Idea */}
                   {analytics.topVotedIdea && (
-                    <div className="card-glass p-6 rounded-2xl">
-                      <h3 className="text-2xl font-bold text-white mb-6">🏆 Most Popular Idea</h3>
-                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div className="card-glass p-3 sm:p-6 rounded-2xl">
+                      <h3 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">🏆 Most Popular Idea</h3>
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6">
                         <div className="flex-1">
-                          <h4 className="text-xl font-semibold text-white mb-2">{analytics.topVotedIdea.title}</h4>
-                          <p className="text-gray-400 text-sm mb-1">By: {analytics.topVotedIdea.authorEmail}</p>
-                          <p className="text-gray-400 text-sm">
+                          <h4 className="text-base sm:text-xl font-semibold text-white mb-1 sm:mb-2">{analytics.topVotedIdea.title}</h4>
+                          <p className="text-gray-400 text-xs sm:text-sm mb-0.5 sm:mb-1">By: {analytics.topVotedIdea.authorEmail}</p>
+                          <p className="text-gray-400 text-xs sm:text-sm">
                             Status: <span className={`${
                               analytics.topVotedIdea.status === 'implemented' ? 'text-green-300' :
                               analytics.topVotedIdea.status === 'in-progress' ? 'text-yellow-300' :
@@ -768,12 +768,12 @@ export default function AdminPanel() {
                           </p>
                         </div>
                         <div className="text-center">
-                          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-xl font-bold text-lg">
+                          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold text-base sm:text-lg">
                             {analytics.topVotedIdea.votesCount} votes
                           </div>
                           <Link
                             href={`/ideas/${analytics.topVotedIdea.id}`}
-                            className="text-eduvos-electric hover:text-eduvos-accent text-sm mt-2 inline-block"
+                            className="text-eduvos-electric hover:text-eduvos-accent text-xs sm:text-sm mt-1 sm:mt-2 inline-block"
                           >
                             View Idea →
                           </Link>

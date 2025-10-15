@@ -1,5 +1,4 @@
-﻿
-'use client';
+﻿'use client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -21,7 +20,7 @@ export default function LoginPage() {
 
   // Fixed positions for particles to prevent hydration errors
   const fixedPositions = [
-    { x: 100, y: 200 }, { x: 300, y: 150 }, { x: 500, y: 400 }, 
+    { x: 100, y: 200 }, { x: 300, y: 150 }, { x: 500, y: 400 },
     { x: 200, y: 600 }, { x: 700, y: 300 }, { x: 400, y: 500 },
     { x: 800, y: 200 }, { x: 150, y: 450 }, { x: 600, y: 350 },
     { x: 250, y: 250 }, { x: 750, y: 550 }, { x: 350, y: 300 },
@@ -61,10 +60,10 @@ export default function LoginPage() {
       try {
         const ref = doc(db, "users", user.uid);
         const snap = await getDoc(ref);
-        
+
         if (snap.exists()) {
           const data = snap.data();
-          
+
           // Only redirect to pages that exist in your app
           if (data?.role === "admin" || user.email?.includes('admin')) {
             router.push("/admin"); // This exists in your app
@@ -80,7 +79,7 @@ export default function LoginPage() {
         router.push("/"); // Always fallback to homepage
       }
     };
-    
+
     redirectUser();
   }, [user, db, router]);
 
@@ -96,10 +95,10 @@ export default function LoginPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-16 h-16 border-4 border-white border-t-transparent rounded-full"
+            className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-white border-t-transparent rounded-full"
           />
           <div>
-            <p className="text-xl font-semibold text-white mb-2">
+            <p className="text-lg sm:text-xl font-semibold text-white mb-2">
               {authLoading ? "Checking authentication..." : "Signing you in..."}
             </p>
             <p className="text-blue-200 text-sm">
@@ -123,7 +122,7 @@ export default function LoginPage() {
         {fixedPositions.map((pos, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 bg-gradient-to-r from-eduvos-accent to-eduvos-innovation rounded-full opacity-30"
+            className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r from-eduvos-accent to-eduvos-innovation rounded-full opacity-30"
             initial={{ x: pos.x, y: pos.y, opacity: 0.2 }}
             animate={mounted ? {
               y: [pos.y, pos.y - 80, pos.y],
@@ -142,7 +141,7 @@ export default function LoginPage() {
 
       {/* 🌈 Pulsing Energy Orbs */}
       <motion.div
-        className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-eduvos-electric/30 to-blue-600/20 rounded-full blur-3xl"
+        className="absolute top-1/4 left-4 sm:left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-r from-eduvos-electric/30 to-blue-600/20 rounded-full blur-3xl"
         animate={mounted ? {
           scale: [1, 1.6, 1],
           opacity: [0.1, 0.3, 0.1],
@@ -150,7 +149,7 @@ export default function LoginPage() {
         transition={{ duration: 8, repeat: Infinity }}
       />
       <motion.div
-        className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-600/20 to-eduvos-innovation/30 rounded-full blur-3xl"
+        className="absolute bottom-1/3 right-4 sm:right-1/4 w-56 h-56 sm:w-80 sm:h-80 bg-gradient-to-r from-purple-600/20 to-eduvos-innovation/30 rounded-full blur-3xl"
         animate={mounted ? {
           scale: [1.4, 1, 1.4],
           opacity: [0.2, 0.1, 0.2],
@@ -163,10 +162,10 @@ export default function LoginPage() {
         {['🎓', '💡', '🚀', '⭐', '📚', '🏆', '✨', '🔬'].map((icon, i) => (
           <motion.div
             key={icon}
-            className="absolute text-2xl opacity-30"
+            className="absolute text-xl sm:text-2xl opacity-30"
             style={{
-              left: `${10 + i * 12}%`,
-              top: `${15 + (i % 4) * 20}%`,
+              left: `${5 + i * 15}%`,
+              top: `${10 + (i % 4) * 25}%`,
             }}
             animate={mounted ? {
               y: [0, -60, 0],
@@ -185,36 +184,36 @@ export default function LoginPage() {
       </div>
 
       {/* 🎪 Main Auth Container */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-8">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-3 sm:px-4 py-6 sm:py-8">
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.8, type: "spring" }}
-          className="w-full max-w-md"
+          className="w-full max-w-xs sm:max-w-sm md:max-w-md"
         >
           {/* 💎 Enhanced Glass Card */}
           <div className="relative">
             {/* Card Background Shine */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-eduvos-electric/20 to-eduvos-innovation/20 rounded-3xl blur-xl"
+              className="absolute inset-0 bg-gradient-to-r from-eduvos-electric/20 to-eduvos-innovation/20 rounded-2xl sm:rounded-3xl blur-xl"
               animate={mounted ? {
                 opacity: [0.3, 0.6, 0.3],
               } : {}}
               transition={{ duration: 4, repeat: Infinity }}
             />
-            
-            <div className="relative card-glass shadow-2xl p-8 rounded-3xl border border-white/20 backdrop-blur-xl bg-white/5">
-              
+
+            <div className="relative card-glass shadow-2xl p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-white/20 backdrop-blur-xl bg-white/5">
+
               {/* 🏆 Header Section */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-center mb-8"
+                className="text-center mb-6 sm:mb-8"
               >
                 {/* Animated Logo */}
                 <motion.div
-                  className="w-20 h-20 bg-gradient-to-br from-eduvos-electric via-eduvos-innovation to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl relative overflow-hidden"
+                  className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gradient-to-br from-eduvos-electric via-eduvos-innovation to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-2xl relative overflow-hidden"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
@@ -230,11 +229,11 @@ export default function LoginPage() {
                       delay: 1,
                     }}
                   />
-                  <span className="text-3xl relative z-10">🎓</span>
+                  <span className="text-2xl sm:text-3xl relative z-10">🎓</span>
                 </motion.div>
 
                 <motion.h1
-                  className="text-4xl font-bold text-white mb-2"
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -242,7 +241,7 @@ export default function LoginPage() {
                   {isLogin ? "Welcome Back" : "Join Eduvos"}
                 </motion.h1>
                 <motion.p
-                  className="text-blue-100 text-lg"
+                  className="text-blue-100 text-sm sm:text-base md:text-lg"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
@@ -259,16 +258,16 @@ export default function LoginPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 onSubmit={handleSubmit}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 {/* Error Message */}
                 {error && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-red-500/20 border border-red-500/40 text-red-100 px-4 py-3 rounded-xl text-sm backdrop-blur-lg flex items-center gap-3"
+                    className="bg-red-500/20 border border-red-500/40 text-red-100 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm backdrop-blur-lg flex items-center gap-2 sm:gap-3"
                   >
-                    <span className="text-lg">⚠️</span>
+                    <span className="text-base sm:text-lg">⚠️</span>
                     <span>{error}</span>
                   </motion.div>
                 )}
@@ -279,7 +278,7 @@ export default function LoginPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.6 }}
                 >
-                  <label className="block text-sm font-semibold text-blue-100 mb-3 flex items-center gap-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-blue-100 mb-2 sm:mb-3 flex items-center gap-2">
                     <span>📧</span>
                     Eduvos Email Address
                   </label>
@@ -288,7 +287,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your.name@eduvos.ac.za"
-                    className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-blue-200/70 focus:outline-none focus:ring-2 focus:ring-eduvos-innovation focus:border-transparent transition-all backdrop-blur-lg"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder:text-blue-200/70 focus:outline-none focus:ring-2 focus:ring-eduvos-innovation focus:border-transparent transition-all backdrop-blur-lg text-sm sm:text-base"
                     required
                   />
                 </motion.div>
@@ -299,7 +298,7 @@ export default function LoginPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.7 }}
                 >
-                  <label className="block text-sm font-semibold text-blue-100 mb-3 flex items-center gap-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-blue-100 mb-2 sm:mb-3 flex items-center gap-2">
                     <span>🔒</span>
                     Password
                   </label>
@@ -308,7 +307,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your secure password"
-                    className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-blue-200/70 focus:outline-none focus:ring-2 focus:ring-eduvos-electric focus:border-transparent transition-all backdrop-blur-lg"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder:text-blue-200/70 focus:outline-none focus:ring-2 focus:ring-eduvos-electric focus:border-transparent transition-all backdrop-blur-lg text-sm sm:text-base"
                     required
                     minLength={6}
                   />
@@ -320,25 +319,25 @@ export default function LoginPage() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full relative overflow-hidden group"
+                  className="w-full relative overflow-hidden group min-h-[50px]"
                 >
                   {/* Animated gradient border */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-eduvos-electric via-eduvos-innovation to-purple-600 rounded-2xl blur-sm group-hover:blur-md transition-all duration-300" />
-                  
-                  <div className="relative bg-gradient-to-r from-eduvos-electric to-eduvos-innovation py-4 rounded-2xl font-bold text-lg text-white shadow-2xl group-hover:shadow-3xl transition-all duration-300 flex items-center justify-center gap-3">
+                  <div className="absolute inset-0 bg-gradient-to-r from-eduvos-electric via-eduvos-innovation to-purple-600 rounded-xl sm:rounded-2xl blur-sm group-hover:blur-md transition-all duration-300" />
+
+                  <div className="relative bg-gradient-to-r from-eduvos-electric to-eduvos-innovation py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg text-white shadow-2xl group-hover:shadow-3xl transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3">
                     {loading ? (
                       <>
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-6 h-6 border-2 border-white border-t-transparent rounded-full"
+                          className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-white border-t-transparent rounded-full"
                         />
-                        <span>{isLogin ? 'Signing In...' : 'Creating Account...'}</span>
+                        <span className="text-sm sm:text-base">{isLogin ? 'Signing In...' : 'Creating Account...'}</span>
                       </>
                     ) : (
                       <>
-                        <span className="text-xl">{isLogin ? '🚀' : '🎓'}</span>
-                        <span>{isLogin ? 'Access Innovation Hub' : 'Start Your Journey'}</span>
+                        <span className="text-lg sm:text-xl">{isLogin ? '🚀' : '🎓'}</span>
+                        <span className="text-sm sm:text-base">{isLogin ? 'Access Innovation Hub' : 'Start Your Journey'}</span>
                       </>
                     )}
                   </div>
@@ -350,15 +349,15 @@ export default function LoginPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.9 }}
-                className="text-center mt-8 space-y-4"
+                className="text-center mt-6 sm:mt-8 space-y-3 sm:space-y-4"
               >
                 <div className="flex items-center justify-center">
                   <div className="flex-1 h-px bg-white/20" />
-                  <span className="px-4 text-blue-200 text-sm">or</span>
+                  <span className="px-3 sm:px-4 text-blue-200 text-xs sm:text-sm">or</span>
                   <div className="flex-1 h-px bg-white/20" />
                 </div>
 
-                <p className="text-blue-200">
+                <p className="text-blue-200 text-sm sm:text-base">
                   {isLogin ? "New to Eduvos Innovate?" : "Already part of our community?"}{' '}
                   <button
                     type="button"
@@ -399,11 +398,11 @@ export default function LoginPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.3 }}
-            className="text-center mt-6"
+            className="text-center mt-4 sm:mt-6"
           >
-            <p className="text-blue-300/70 text-sm">
-              {isLogin 
-                ? "✨ Your next breakthrough awaits inside..." 
+            <p className="text-blue-300/70 text-xs sm:text-sm">
+              {isLogin
+                ? "✨ Your next breakthrough awaits inside..."
                 : "🎯 Join thousands of Eduvos innovators"}
             </p>
           </motion.div>

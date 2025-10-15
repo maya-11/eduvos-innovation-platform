@@ -676,14 +676,14 @@ export default function Profile() {
 // Enhanced Loading Component
 function LoadingGate({ message = "Loading..." }: { message?: string }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1E3D] to-[#7C3AED]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1E3D] to-[#7C3AED] px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="text-center"
+        className="text-center w-full max-w-md"
       >
         <motion.div
-          className="w-32 h-32 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl"
+          className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] rounded-3xl flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-2xl"
           animate={{ 
             rotate: 360,
             scale: [1, 1.1, 1],
@@ -693,10 +693,10 @@ function LoadingGate({ message = "Loading..." }: { message?: string }) {
             scale: { duration: 2, repeat: Infinity }
           }}
         >
-          <span className="text-5xl">🌟</span>
+          <span className="text-4xl sm:text-5xl">🌟</span>
         </motion.div>
         <motion.h2 
-          className="text-2xl font-bold text-white mb-4"
+          className="text-lg sm:text-2xl font-bold text-white mb-3 sm:mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -704,7 +704,7 @@ function LoadingGate({ message = "Loading..." }: { message?: string }) {
           {message}
         </motion.h2>
         <motion.div
-          className="w-48 h-1 bg-white/20 rounded-full mx-auto overflow-hidden"
+          className="w-40 sm:w-48 h-1 bg-white/20 rounded-full mx-auto overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}

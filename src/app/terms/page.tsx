@@ -39,7 +39,7 @@ export default function TermsPage() {
       
       {/* Animated background elements */}
       <div className="absolute inset-0 opacity-20">
-        {isMounted && [...Array(15)].map((_, i) => (
+        {isMounted && [...Array(12)].map((_, i) => (
           <motion.div
             key={`line-${i}`}
             className="absolute h-px bg-gradient-to-r from-transparent via-[#60A5FA] to-transparent"
@@ -54,7 +54,7 @@ export default function TermsPage() {
       {isMounted && ['⚖️', '📝', '🔒', '👥', '💼', '🌐'].map((icon, i) => (
         <motion.div
           key={icon}
-          className="absolute text-2xl opacity-10"
+          className="absolute text-xl sm:text-2xl opacity-10"
           style={{
             left: `${Math.random() * 90 + 5}%`,
             top: `${Math.random() * 90 + 5}%`,
@@ -79,12 +79,12 @@ export default function TermsPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="card-glass m-6 mb-8"
+          className="card-glass m-4 sm:m-6 mb-6 sm:mb-8"
         >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 sm:p-6">
             <div>
               <motion.h1 
-                className="text-4xl font-bold text-white mb-2 font-playfair"
+                className="text-3xl sm:text-4xl font-bold text-white mb-2 font-playfair"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
@@ -92,7 +92,7 @@ export default function TermsPage() {
                 Terms of <span className="text-gradient">Service</span>
               </motion.h1>
               <motion.p 
-                className="text-gray-300"
+                className="text-gray-300 text-sm sm:text-base"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
@@ -109,7 +109,7 @@ export default function TermsPage() {
             >
               <Link 
                 href="/"
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white transition-all duration-300"
+                className="px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg sm:rounded-xl text-white transition-all duration-300 text-sm sm:text-base"
               >
                 ← Back Home
               </Link>
@@ -117,7 +117,7 @@ export default function TermsPage() {
           </div>
         </motion.div>
 
-        <div className="container mx-auto px-6 pb-12">
+        <div className="container mx-auto px-4 sm:px-6 pb-8 sm:pb-12">
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -127,20 +127,20 @@ export default function TermsPage() {
             {/* Introduction */}
             <motion.div
               variants={itemVariants}
-              className="card-glass p-8 rounded-2xl mb-8"
+              className="card-glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl mb-6 sm:mb-8"
             >
-              <div className="text-center mb-8">
+              <div className="text-center mb-6 sm:mb-8">
                 <motion.div
-                  className="text-6xl mb-4"
+                  className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 >
                   ⚖️
                 </motion.div>
-                <h2 className="text-3xl font-bold text-white mb-4">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">
                   Welcome to Our Innovation Platform
                 </h2>
-                <p className="text-gray-300 text-lg">
+                <p className="text-gray-300 text-base sm:text-lg">
                   These terms govern your use of our idea-sharing platform. By using our services, 
                   you're joining a community dedicated to innovation and collaboration.
                 </p>
@@ -148,7 +148,7 @@ export default function TermsPage() {
             </motion.div>
 
             {/* Terms Sections */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {[
                 {
                   icon: '🎯',
@@ -194,20 +194,20 @@ export default function TermsPage() {
                 <motion.div
                   key={section.title}
                   variants={itemVariants}
-                  className="card-glass p-6 rounded-2xl border border-white/10 hover:border-[#60A5FA]/30 transition-all duration-300 group"
+                  className="card-glass p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 hover:border-[#60A5FA]/30 transition-all duration-300 group"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     <motion.div
-                      className="text-3xl flex-shrink-0"
+                      className="text-2xl sm:text-3xl flex-shrink-0"
                       whileHover={{ scale: 1.2, rotate: 10 }}
                     >
                       {section.icon}
                     </motion.div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#60A5FA] transition-colors">
+                      <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3 group-hover:text-[#60A5FA] transition-colors">
                         {section.title}
                       </h3>
-                      <p className="text-gray-300 leading-relaxed">
+                      <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
                         {section.content}
                       </p>
                     </div>
@@ -219,31 +219,31 @@ export default function TermsPage() {
             {/* Call to Action */}
             <motion.div
               variants={itemVariants}
-              className="card-glass p-8 rounded-2xl mt-8 text-center border border-[#60A5FA]/20"
+              className="card-glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl mt-6 sm:mt-8 text-center border border-[#60A5FA]/20"
             >
               <motion.div
-                className="text-4xl mb-4"
+                className="text-3xl sm:text-4xl mb-3 sm:mb-4"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
               >
                 🤝
               </motion.div>
-              <h3 className="text-2xl font-bold text-white mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">
                 Ready to Innovate?
               </h3>
-              <p className="text-gray-300 mb-6">
+              <p className="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
                 By continuing to use our platform, you agree to these terms and our commitment to fostering innovation.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <Link
                   href="/ideas"
-                  className="px-6 py-3 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white rounded-lg sm:rounded-xl font-semibold hover:shadow-lg transition-all duration-300 text-sm sm:text-base min-h-[44px] flex items-center justify-center"
                 >
                   Explore Ideas
                 </Link>
                 <Link
                   href="/support"
-                  className="px-6 py-3 bg-white/10 border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-all duration-300"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-white/10 border border-white/20 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 text-sm sm:text-base min-h-[44px] flex items-center justify-center"
                 >
                   Get Help
                 </Link>

@@ -58,13 +58,13 @@ export default function SupportPage() {
       
       {/* Animated background elements */}
       <div className="absolute inset-0 opacity-20">
-        {isMounted && [...Array(12)].map((_, i) => (
+        {isMounted && [...Array(8)].map((_, i) => (
           <motion.div
             key={`circle-${i}`}
             className="absolute rounded-full border border-[#60A5FA]"
             style={{
-              width: Math.random() * 100 + 50,
-              height: Math.random() * 100 + 50,
+              width: Math.random() * 60 + 30,
+              height: Math.random() * 60 + 30,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
@@ -86,12 +86,12 @@ export default function SupportPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="card-glass m-6 mb-8"
+          className="card-glass m-4 sm:m-6 mb-6 sm:mb-8"
         >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 sm:p-6">
             <div>
               <motion.h1 
-                className="text-4xl font-bold text-white mb-2 font-playfair"
+                className="text-3xl sm:text-4xl font-bold text-white mb-2 font-playfair"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
@@ -99,7 +99,7 @@ export default function SupportPage() {
                 Support <span className="text-gradient">Center</span>
               </motion.h1>
               <motion.p 
-                className="text-gray-300"
+                className="text-gray-300 text-sm sm:text-base"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
@@ -116,7 +116,7 @@ export default function SupportPage() {
             >
               <Link 
                 href="/"
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white transition-all duration-300"
+                className="px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg sm:rounded-xl text-white transition-all duration-300 text-sm sm:text-base"
               >
                 ← Back Home
               </Link>
@@ -124,13 +124,13 @@ export default function SupportPage() {
           </div>
         </motion.div>
 
-        <div className="container mx-auto px-6 pb-12">
+        <div className="container mx-auto px-4 sm:px-6 pb-8 sm:pb-12">
           {/* Quick Help Cards */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8"
           >
             {categories.map((category, index) => (
               <motion.button
@@ -141,20 +141,20 @@ export default function SupportPage() {
                 transition={{ delay: 0.6 + index * 0.1 }}
                 whileHover={{ y: -5, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`card-glass p-6 rounded-2xl text-center transition-all duration-300 ${
+                className={`card-glass p-4 sm:p-6 rounded-xl sm:rounded-2xl text-center transition-all duration-300 min-h-[100px] sm:min-h-[120px] ${
                   activeCategory === category.id 
                     ? 'border-2 border-[#60A5FA] bg-[#60A5FA]/10' 
                     : 'border border-white/10 hover:border-white/20'
                 }`}
               >
-                <div className="text-3xl mb-3">{category.icon}</div>
-                <div className="text-white font-semibold">{category.name}</div>
+                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">{category.icon}</div>
+                <div className="text-white font-semibold text-sm sm:text-base">{category.name}</div>
               </motion.button>
             ))}
           </motion.div>
 
           {/* FAQ Section */}
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
             {/* FAQ List */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -162,25 +162,25 @@ export default function SupportPage() {
               transition={{ delay: 0.7 }}
               className="lg:col-span-2"
             >
-              <div className="card-glass p-6 rounded-2xl">
-                <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <div className="card-glass p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-3">
                   <span>💬</span>
                   Frequently Asked Questions
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {faqs[activeCategory as keyof typeof faqs].map((faq, index) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.8 + index * 0.1 }}
-                      className="bg-white/5 border border-white/10 rounded-xl p-5 hover:border-[#60A5FA]/30 transition-all duration-300"
+                      className="bg-white/5 border border-white/10 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 hover:border-[#60A5FA]/30 transition-all duration-300"
                     >
-                      <h4 className="text-white font-semibold mb-2 flex items-start gap-3">
-                        <span className="text-[#60A5FA] text-lg">•</span>
+                      <h4 className="text-white font-semibold mb-2 flex items-start gap-2 sm:gap-3 text-sm sm:text-base">
+                        <span className="text-[#60A5FA] text-base sm:text-lg">•</span>
                         {faq.question}
                       </h4>
-                      <p className="text-gray-300 text-sm leading-relaxed pl-6">
+                      <p className="text-gray-300 text-xs sm:text-sm leading-relaxed pl-4 sm:pl-6">
                         {faq.answer}
                       </p>
                     </motion.div>
@@ -194,20 +194,20 @@ export default function SupportPage() {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.8 }}
-              className="space-y-6"
+              className="space-y-4 sm:space-y-6"
             >
               {/* Contact Card */}
-              <div className="card-glass p-6 rounded-2xl">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+              <div className="card-glass p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
                   <span>📞</span>
                   Contact Support
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-gray-300">
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex items-center gap-2 sm:gap-3 text-gray-300 text-sm sm:text-base">
                     <span>📧</span>
                     <span>support@eduvos.com</span>
                   </div>
-                  <div className="flex items-center gap-3 text-gray-300">
+                  <div className="flex items-center gap-2 sm:gap-3 text-gray-300 text-sm sm:text-base">
                     <span>🕒</span>
                     <span>24/7 Response within 6 hours</span>
                   </div>
@@ -215,12 +215,12 @@ export default function SupportPage() {
               </div>
 
               {/* Quick Resources */}
-              <div className="card-glass p-6 rounded-2xl">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+              <div className="card-glass p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
                   <span>🚀</span>
                   Quick Resources
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {[
                     { name: 'Getting Started Guide', icon: '🎯', href: '/about' },
                     { name: 'Community Guidelines', icon: '📜', href: '/terms' },
@@ -230,10 +230,10 @@ export default function SupportPage() {
                     <Link
                       key={resource.name}
                       href={resource.href}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#60A5FA]/30 transition-all duration-300 group"
+                      className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#60A5FA]/30 transition-all duration-300 group"
                     >
-                      <span className="text-lg">{resource.icon}</span>
-                      <span className="text-white group-hover:text-[#60A5FA] transition-colors">
+                      <span className="text-base sm:text-lg">{resource.icon}</span>
+                      <span className="text-white group-hover:text-[#60A5FA] transition-colors text-sm sm:text-base">
                         {resource.name}
                       </span>
                     </Link>
@@ -242,22 +242,22 @@ export default function SupportPage() {
               </div>
 
               {/* Social Media */}
-              <div className="card-glass p-6 rounded-2xl">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+              <div className="card-glass p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
                   <span>🌐</span>
                   Connect With Eduvos
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2 sm:gap-3">
                   {socialMedia.map((social, index) => (
                     <a
                       key={social.name}
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10 ${social.color} transition-all duration-300 group`}
+                      className={`flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-white/5 border border-white/10 ${social.color} transition-all duration-300 group min-h-[44px]`}
                     >
-                      <span className="text-lg">{social.icon}</span>
-                      <span className="text-white text-sm group-hover:text-white transition-colors">
+                      <span className="text-base sm:text-lg">{social.icon}</span>
+                      <span className="text-white text-xs sm:text-sm group-hover:text-white transition-colors">
                         {social.name}
                       </span>
                     </a>
@@ -266,15 +266,15 @@ export default function SupportPage() {
               </div>
 
               {/* Emergency Help */}
-              <div className="card-glass p-6 rounded-2xl border border-orange-500/20 bg-orange-500/5">
-                <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-3">
+              <div className="card-glass p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-orange-500/20 bg-orange-500/5">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
                   <span>🚨</span>
                   Urgent Help Needed?
                 </h3>
-                <p className="text-gray-300 text-sm mb-4">
+                <p className="text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4">
                   For critical issues affecting platform access or security concerns.
                 </p>
-                <button className="w-full bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 text-orange-200 py-2 rounded-lg transition-all duration-300">
+                <button className="w-full bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 text-orange-200 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base min-h-[44px]">
                   Emergency Contact
                 </button>
               </div>
@@ -286,25 +286,25 @@ export default function SupportPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="card-glass p-8 rounded-2xl mt-8"
+            className="card-glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl mt-6 sm:mt-8"
           >
-            <h3 className="text-2xl font-bold text-white mb-6 text-center">
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 text-center">
               📝 Still Need Help?
             </h3>
-            <div className="max-w-2xl mx-auto space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+            <div className="max-w-2xl mx-auto space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <input
                   type="text"
                   placeholder="Your Name"
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#60A5FA] transition-colors"
+                  className="bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#60A5FA] transition-colors text-sm sm:text-base min-h-[44px]"
                 />
                 <input
                   type="email"
                   placeholder="Your Email"
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#60A5FA] transition-colors"
+                  className="bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#60A5FA] transition-colors text-sm sm:text-base min-h-[44px]"
                 />
               </div>
-              <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#60A5FA] transition-colors">
+              <select className="w-full bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white focus:outline-none focus:border-[#60A5FA] transition-colors text-sm sm:text-base min-h-[44px]">
                 <option value="">Select Issue Type</option>
                 <option value="technical">Technical Issue</option>
                 <option value="account">Account Problem</option>
@@ -313,10 +313,10 @@ export default function SupportPage() {
               </select>
               <textarea
                 placeholder="Describe your issue in detail..."
-                rows={4}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#60A5FA] transition-colors resize-none"
+                rows={3}
+                className="w-full bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#60A5FA] transition-colors resize-none text-sm sm:text-base min-h-[100px]"
               />
-              <button className="w-full bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+              <button className="w-full bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold hover:shadow-lg transition-all duration-300 text-sm sm:text-base min-h-[44px]">
                 Send Message
               </button>
             </div>

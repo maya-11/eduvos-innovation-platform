@@ -168,13 +168,13 @@ export default function WorkflowBoard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-eduvos-deep via-purple-900/80 to-blue-900/60">
-        <div className="card-glass p-8 text-center backdrop-blur-xl">
+        <div className="card-glass p-6 sm:p-8 text-center backdrop-blur-xl">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-16 h-16 border-4 border-eduvos-electric border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-eduvos-electric border-t-transparent rounded-full mx-auto mb-4"
           />
-          <div className="text-xl text-white font-light">Loading Innovation Board...</div>
+          <div className="text-lg sm:text-xl text-white font-light">Loading Innovation Board...</div>
         </div>
       </div>
     );
@@ -190,37 +190,37 @@ export default function WorkflowBoard() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="card-glass m-6 mb-8 border border-white/10 backdrop-blur-xl"
+          className="card-glass m-2 sm:m-4 md:m-6 mb-4 sm:mb-6 md:mb-8 border border-white/10 backdrop-blur-xl"
         >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 sm:p-6">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2 font-playfair">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2 font-playfair">
                 Innovation Workflow
               </h1>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-sm sm:text-base">
                 Visualize and manage your innovation pipeline
                 {!user && ' • Login to interact'}
               </p>
             </div>
             
-            <div className="flex items-center gap-4 mt-4 md:mt-0">
-              <div className="flex items-center gap-2 text-gray-300">
+            <div className="flex items-center gap-2 sm:gap-4 mt-4 md:mt-0">
+              <div className="flex items-center gap-1 sm:gap-2 text-gray-300">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span>{ideas.length} Active Ideas</span>
+                <span className="text-xs sm:text-sm">{ideas.length} Active Ideas</span>
               </div>
-              <div className="px-3 py-1 bg-eduvos-innovation/20 text-eduvos-innovation rounded-full text-sm border border-eduvos-innovation/30">
+              <div className="px-2 sm:px-3 py-1 bg-eduvos-innovation/20 text-eduvos-innovation rounded-full text-xs sm:text-sm border border-eduvos-innovation/30">
                 Live Board
               </div>
             </div>
           </div>
         </motion.div>
 
-        <div className="container mx-auto px-6 pb-12">
+        <div className="max-w-full md:container mx-auto px-2 sm:px-4 md:px-6 pb-8 sm:pb-10 md:pb-12">
           {/* Stats Overview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-4 mb-4 sm:mb-8"
           >
             {Object.entries(statusConfig).map(([status, config], index) => (
               <motion.div
@@ -229,19 +229,19 @@ export default function WorkflowBoard() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
-                className={`card-glass p-4 text-center backdrop-blur-xl border border-white/5 ${config.bgGradient} rounded-xl`}
+                className={`card-glass p-2 sm:p-4 text-center backdrop-blur-xl border border-white/5 ${config.bgGradient} rounded-xl`}
               >
-                <div className="text-2xl mb-2">{config.emoji}</div>
-                <div className="text-2xl font-bold text-white mb-1">
+                <div className="text-xl sm:text-2xl mb-1 sm:mb-2">{config.emoji}</div>
+                <div className="text-lg sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">
                   {ideasByStatus[status as keyof typeof ideasByStatus].length}
                 </div>
-                <div className="text-gray-300 text-sm font-medium">{config.title}</div>
+                <div className="text-gray-300 text-xs sm:text-sm font-medium">{config.title}</div>
               </motion.div>
             ))}
           </motion.div>
 
           {/* Kanban Board */}
-          <div className={`flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent ${
+          <div className={`flex gap-2 sm:gap-4 overflow-x-auto pb-4 sm:pb-6 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent ${
             isDragging ? 'scale-95' : 'scale-100'
           } transition-all duration-300`}>
             <AnimatePresence>
@@ -250,32 +250,32 @@ export default function WorkflowBoard() {
                   key={status}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="flex-shrink-0 w-72"
+                  className="flex-shrink-0 w-64 sm:w-72 md:w-80"
                 >
                   {/* Column Header */}
                   <motion.div 
-                    className={`card-glass p-4 mb-4 border-l-4 backdrop-blur-xl rounded-xl ${config.bgGradient} ${
+                    className={`card-glass p-3 sm:p-4 mb-2 sm:mb-4 border-l-4 backdrop-blur-xl rounded-xl ${config.bgGradient} ${
                       activeColumn === status ? 'ring-2 ring-white/20' : ''
                     } transition-all duration-200`}
                     style={{ borderLeftColor: config.color }}
                     whileHover={{ scale: 1.02 }}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <div 
-                          className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg shadow-lg"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-white text-base sm:text-lg shadow-lg"
                           style={{ backgroundColor: config.color }}
                         >
                           {config.icon}
                         </div>
                         <div>
-                          <h3 className="font-bold text-white">{config.title}</h3>
-                          <p className="text-gray-400 text-sm">
+                          <h3 className="font-bold text-white text-sm sm:text-base">{config.title}</h3>
+                          <p className="text-gray-400 text-xs sm:text-sm">
                             {ideasByStatus[status as keyof typeof ideasByStatus].length} items
                           </p>
                         </div>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                         {ideasByStatus[status as keyof typeof ideasByStatus].length}
                       </div>
                     </div>
@@ -286,13 +286,13 @@ export default function WorkflowBoard() {
                     onDragOver={(e) => handleDragOver(e, status)}
                     onDrop={(e) => handleDrop(e, status as Idea['status'])}
                     onDragLeave={handleDragLeave}
-                    className={`min-h-[600px] rounded-2xl p-3 backdrop-blur-xl border-2 border-dashed transition-all duration-300 ${
+                    className={`min-h-[400px] sm:min-h-[600px] rounded-2xl p-2 sm:p-3 backdrop-blur-xl border-2 border-dashed transition-all duration-300 ${
                       activeColumn === status 
                         ? `bg-gradient-to-br ${config.bgGradient} shadow-xl border-[${config.color}]/50` 
                         : 'card-glass border-white/10'
                     }`}
                   >
-                    <div className="space-y-3 h-full">
+                    <div className="space-y-2 sm:space-y-3 h-full">
                       <AnimatePresence mode="popLayout">
                         {ideasByStatus[status as keyof typeof ideasByStatus].map((idea) => (
                           <motion.div
@@ -303,7 +303,7 @@ export default function WorkflowBoard() {
                             exit={{ opacity: 0, scale: 0.9 }}
                             draggable={!!user}
                             drag={!!user}
-                            className={`card-glass p-4 rounded-xl border border-white/10 cursor-grab active:cursor-grabbing group backdrop-blur-lg ${
+                            className={`card-glass p-3 sm:p-4 rounded-xl border border-white/10 cursor-grab active:cursor-grabbing group backdrop-blur-lg ${
                               draggedIdea === idea.id 
                                 ? 'opacity-50 scale-95' 
                                 : 'opacity-100 hover:scale-105'
@@ -314,15 +314,15 @@ export default function WorkflowBoard() {
                             onPointerUp={handleDragEnd}
                           >
                             {/* Idea Card */}
-                            <div className="space-y-3">
+                            <div className="space-y-2 sm:space-y-3">
                               {/* Header with votes */}
                               <div className="flex items-start justify-between">
-                                <h4 className="font-semibold text-white text-sm leading-tight flex-1 pr-3 line-clamp-2">
+                                <h4 className="font-semibold text-white text-xs sm:text-sm leading-tight flex-1 pr-2 sm:pr-3 line-clamp-2">
                                   {idea.title}
                                 </h4>
-                                <div className="flex items-center gap-1 bg-white/10 rounded-full px-2 py-1 border border-white/20">
+                                <div className="flex items-center gap-0.5 sm:gap-1 bg-white/10 rounded-full px-1.5 sm:px-2 py-0.5 border border-white/20">
                                   <span className="text-yellow-400 text-xs">▲</span>
-                                  <span className="text-white text-sm font-bold">{idea.votesCount}</span>
+                                  <span className="text-white text-xs sm:text-sm font-bold">{idea.votesCount}</span>
                                 </div>
                               </div>
 
@@ -337,13 +337,13 @@ export default function WorkflowBoard() {
                                   {idea.tags.slice(0, 2).map((tag, tagIndex) => (
                                     <span
                                       key={tagIndex}
-                                      className="px-2 py-1 bg-white/10 text-gray-300 rounded-full text-xs border border-white/20"
+                                      className="px-2 py-0.5 bg-white/10 text-gray-300 rounded-full text-xs border border-white/20"
                                     >
                                       {tag}
                                     </span>
                                   ))}
                                   {idea.tags.length > 2 && (
-                                    <span className="px-2 py-1 bg-white/10 text-gray-300 rounded-full text-xs border border-white/20">
+                                    <span className="px-2 py-0.5 bg-white/10 text-gray-300 rounded-full text-xs border border-white/20">
                                       +{idea.tags.length - 2}
                                     </span>
                                   )}
@@ -352,8 +352,8 @@ export default function WorkflowBoard() {
 
                               {/* Footer */}
                               <div className="flex items-center justify-between pt-2 border-t border-white/10">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-6 h-6 bg-gradient-to-r from-eduvos-electric to-eduvos-innovation rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                <div className="flex items-center gap-1 sm:gap-2">
+                                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r from-eduvos-electric to-eduvos-innovation rounded-full flex items-center justify-center text-white text-xs font-bold">
                                     {idea.authorEmail[0].toUpperCase()}
                                   </div>
                                   <span className="text-gray-400 text-xs">
@@ -361,7 +361,7 @@ export default function WorkflowBoard() {
                                   </span>
                                 </div>
                                 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1 sm:gap-2">
                                   <Link 
                                     href={`/ideas/${idea.id}`}
                                     className="text-eduvos-electric hover:text-eduvos-accent text-xs font-medium transition-colors"
@@ -380,11 +380,11 @@ export default function WorkflowBoard() {
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          className="text-center py-12 text-gray-400 rounded-xl border-2 border-dashed border-white/10"
+                          className="text-center py-8 sm:py-12 text-gray-400 rounded-xl border-2 border-dashed border-white/10"
                         >
-                          <div className="text-3xl mb-2 opacity-50">{config.emoji}</div>
-                          <p className="text-sm font-medium">No items</p>
-                          <p className="text-xs mt-1 opacity-75">Drop ideas here</p>
+                          <div className="text-2xl sm:text-3xl mb-1 sm:mb-2 opacity-50">{config.emoji}</div>
+                          <p className="text-xs sm:text-sm font-medium">No items</p>
+                          <p className="text-xs mt-0.5 sm:mt-1 opacity-75">Drop ideas here</p>
                         </motion.div>
                       )}
                     </div>
@@ -400,13 +400,13 @@ export default function WorkflowBoard() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="card-glass p-6 mt-8 border-l-4 border-l-eduvos-electric rounded-xl backdrop-blur-xl"
+                className="card-glass p-4 sm:p-6 mt-4 sm:mt-8 border-l-4 border-l-eduvos-electric rounded-xl backdrop-blur-xl"
               >
-                <div className="flex items-center gap-4">
-                  <div className="text-2xl">💡</div>
+                <div className="flex items-center gap-2 sm:gap-4">
+                  <div className="text-xl sm:text-2xl">💡</div>
                   <div>
-                    <h3 className="font-semibold text-white mb-1">How to use the board</h3>
-                    <p className="text-gray-300 text-sm">
+                    <h3 className="font-semibold text-white mb-0.5 sm:mb-1 text-sm sm:text-base">How to use the board</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm">
                       Drag ideas between columns to update their status. 
                       The flow is: <span className="text-eduvos-electric">Backlog</span> → 
                       <span className="text-blue-400"> Validated</span> → 
@@ -420,18 +420,18 @@ export default function WorkflowBoard() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="card-glass p-6 mt-8 border-l-4 border-l-amber-400 bg-amber-400/10 rounded-xl backdrop-blur-xl"
+                className="card-glass p-4 sm:p-6 mt-4 sm:mt-8 border-l-4 border-l-amber-400 bg-amber-400/10 rounded-xl backdrop-blur-xl"
               >
-                <div className="flex items-center gap-4">
-                  <div className="text-2xl">🔐</div>
+                <div className="flex items-center gap-2 sm:gap-4">
+                  <div className="text-xl sm:text-2xl">🔐</div>
                   <div>
-                    <h3 className="font-semibold text-white mb-1">Login Required</h3>
-                    <p className="text-gray-300 text-sm mb-3">
+                    <h3 className="font-semibold text-white mb-0.5 sm:mb-1 text-sm sm:text-base">Login Required</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm mb-2 sm:mb-3">
                       You need to be logged in to manage the workflow board.
                     </p>
                     <Link 
                       href="/login" 
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-eduvos-electric to-eduvos-innovation text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300"
+                      className="inline-flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-eduvos-electric to-eduvos-innovation text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300 text-xs sm:text-base"
                     >
                       <span>Login to Continue</span>
                       <span>→</span>

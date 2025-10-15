@@ -43,7 +43,7 @@ export default function Dashboard() {
           where("authorId", "==", user.uid)
         );
         const userIdeasSnapshot = await getDocs(userIdeasQuery);
-        
+
         const userIdeas: any[] = [];
         let totalVotes = 0;
         let inProgressCount = 0;
@@ -53,7 +53,7 @@ export default function Dashboard() {
           const ideaData = doc.data();
           userIdeas.push(ideaData);
           totalVotes += ideaData.votesCount || 0;
-          
+
           if (ideaData.status === 'in-progress') {
             inProgressCount++;
           } else if (ideaData.status === 'implemented') {
@@ -90,7 +90,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#0A1E3D] via-purple-900/50 to-[#7C3AED]">
-      
+
       {/* Enhanced Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(15)].map((_, i) => (
@@ -98,8 +98,8 @@ export default function Dashboard() {
             key={i}
             className="absolute rounded-full opacity-15"
             style={{
-              width: Math.random() * 6 + 2,
-              height: Math.random() * 6 + 2,
+              width: Math.random() * 4 + 2,
+              height: Math.random() * 4 + 2,
               background: 'hsl(210, 70%, 60%)',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -118,23 +118,23 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <motion.h1 
-            className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-[#60A5FA] to-[#8B5CF6] bg-clip-text text-transparent mb-4"
+          <motion.h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-white via-[#60A5FA] to-[#8B5CF6] bg-clip-text text-transparent mb-3 sm:mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
             Innovation Hub
           </motion.h1>
-          <motion.p 
-            className="text-xl text-gray-300 max-w-2xl mx-auto"
+          <motion.p
+            className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -148,7 +148,7 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -157,25 +157,25 @@ export default function Dashboard() {
             whileHover={{ scale: 1.02, y: -5 }}
             className="relative group"
           >
-            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-6 h-full transition-all duration-300 group-hover:border-white/30">
+            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-xl sm:rounded-2xl p-4 sm:p-6 h-full transition-all duration-300 group-hover:border-white/30">
               <motion.div
-                className="w-16 h-16 bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg"
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 mx-auto shadow-lg"
                 animate={{ rotate: [0, 5, 0, -5, 0], scale: [1, 1.05, 1] }}
                 transition={{ duration: 4, repeat: Infinity }}
               >
-                <span className="text-2xl">💡</span>
+                <span className="text-xl sm:text-2xl">💡</span>
               </motion.div>
-              
-              <h3 className="text-xl font-bold text-white text-center mb-2">
+
+              <h3 className="text-lg sm:text-xl font-bold text-white text-center mb-2">
                 Submit New Idea
               </h3>
-              <p className="text-gray-400 text-center mb-4">
+              <p className="text-gray-400 text-center mb-3 sm:mb-4 text-sm sm:text-base">
                 Share your innovative ideas with the Eduvos community
               </p>
-              
+
               <Link href="/ideas/new">
                 <motion.button
-                  className="w-full bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] text-white py-3 rounded-xl font-semibold transition-all shadow-lg"
+                  className="w-full bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all shadow-lg text-sm sm:text-base min-h-[44px]"
                   whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(59, 130, 246, 0.4)" }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -183,7 +183,7 @@ export default function Dashboard() {
                 </motion.button>
               </Link>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
           </motion.div>
 
           <motion.div
@@ -193,25 +193,25 @@ export default function Dashboard() {
             whileHover={{ scale: 1.02, y: -5 }}
             className="relative group"
           >
-            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-6 h-full transition-all duration-300 group-hover:border-white/30">
+            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-xl sm:rounded-2xl p-4 sm:p-6 h-full transition-all duration-300 group-hover:border-white/30">
               <motion.div
-                className="w-16 h-16 bg-gradient-to-r from-[#10B981] to-[#047857] rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg"
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-[#10B981] to-[#047857] rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 mx-auto shadow-lg"
                 animate={{ rotate: [0, 5, 0, -5, 0], scale: [1, 1.05, 1] }}
                 transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
               >
-                <span className="text-2xl">🔍</span>
+                <span className="text-xl sm:text-2xl">🔍</span>
               </motion.div>
-              
-              <h3 className="text-xl font-bold text-white text-center mb-2">
+
+              <h3 className="text-lg sm:text-xl font-bold text-white text-center mb-2">
                 Browse Ideas
               </h3>
-              <p className="text-gray-400 text-center mb-4">
+              <p className="text-gray-400 text-center mb-3 sm:mb-4 text-sm sm:text-base">
                 Explore innovative ideas from the community
               </p>
-              
+
               <Link href="/ideas">
                 <motion.button
-                  className="w-full bg-gradient-to-r from-[#10B981] to-[#047857] text-white py-3 rounded-xl font-semibold transition-all shadow-lg"
+                  className="w-full bg-gradient-to-r from-[#10B981] to-[#047857] text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all shadow-lg text-sm sm:text-base min-h-[44px]"
                   whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(16, 185, 129, 0.4)" }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -219,7 +219,7 @@ export default function Dashboard() {
                 </motion.button>
               </Link>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#10B981] to-[#047857] rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#10B981] to-[#047857] rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
           </motion.div>
 
           <motion.div
@@ -229,25 +229,25 @@ export default function Dashboard() {
             whileHover={{ scale: 1.02, y: -5 }}
             className="relative group"
           >
-            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-6 h-full transition-all duration-300 group-hover:border-white/30">
+            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-xl sm:rounded-2xl p-4 sm:p-6 h-full transition-all duration-300 group-hover:border-white/30">
               <motion.div
-                className="w-16 h-16 bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg"
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 mx-auto shadow-lg"
                 animate={{ rotate: [0, 5, 0, -5, 0], scale: [1, 1.05, 1] }}
                 transition={{ duration: 4, repeat: Infinity, delay: 1 }}
               >
-                <span className="text-2xl">📊</span>
+                <span className="text-xl sm:text-2xl">📊</span>
               </motion.div>
-              
-              <h3 className="text-xl font-bold text-white text-center mb-2">
+
+              <h3 className="text-lg sm:text-xl font-bold text-white text-center mb-2">
                 My Submissions
               </h3>
-              <p className="text-gray-400 text-center mb-4">
+              <p className="text-gray-400 text-center mb-3 sm:mb-4 text-sm sm:text-base">
                 Manage and track your submitted ideas
               </p>
-              
+
               <Link href="/profile?tab=ideas">
                 <motion.button
-                  className="w-full bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] text-white py-3 rounded-xl font-semibold transition-all shadow-lg"
+                  className="w-full bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all shadow-lg text-sm sm:text-base min-h-[44px]"
                   whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(139, 92, 246, 0.4)" }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -255,7 +255,7 @@ export default function Dashboard() {
                 </motion.button>
               </Link>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
           </motion.div>
         </motion.section>
 
@@ -264,50 +264,50 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="mb-12"
+          className="mb-8 sm:mb-12"
         >
-          <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-8">
-            <motion.h2 
-              className="text-3xl font-bold text-white mb-8 text-center"
+          <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
+            <motion.h2
+              className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 text-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.9 }}
             >
               Your Innovation Impact
             </motion.h2>
-            
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.0 }}
                 whileHover={{ scale: 1.05 }}
-                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group"
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 text-center relative overflow-hidden group"
               >
                 <motion.div
                   className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
                   style={{ backgroundColor: '#3B82F6' }}
                 />
-                
+
                 <motion.div
-                  className="text-3xl mb-3"
+                  className="text-2xl sm:text-3xl mb-2 sm:mb-3"
                   animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 >
-                  📝
+                  💡
                 </motion.div>
-                
-                <motion.div 
-                  className="text-4xl font-bold mb-2"
-                  style={{ color: '#3B82F6' }}
+
+                <motion.div
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2"
+                  style={{ color: '#10B981' }}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200, delay: 1.1 }}
+                  transition={{ type: "spring", stiffness: 200, delay: 1.2 }}
                 >
                   {stats.ideasSubmitted}
                 </motion.div>
-                
-                <div className="text-gray-300 text-sm font-medium">
+
+                <div className="text-gray-300 text-xs sm:text-sm font-medium">
                   Ideas Submitted
                 </div>
               </motion.div>
@@ -315,25 +315,25 @@ export default function Dashboard() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.1 }}
+                transition={{ delay: 1.2 }}
                 whileHover={{ scale: 1.05 }}
-                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group"
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 text-center relative overflow-hidden group"
               >
                 <motion.div
                   className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
-                  style={{ backgroundColor: '#10B981' }}
+                  style={{ backgroundColor: '#3B82F6' }}
                 />
-                
+
                 <motion.div
-                  className="text-3xl mb-3"
+                  className="text-2xl sm:text-3xl mb-2 sm:mb-3"
                   animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+                  transition={{ duration: 3, repeat: Infinity }}
                 >
-                  👍
+                  ❤️
                 </motion.div>
-                
-                <motion.div 
-                  className="text-4xl font-bold mb-2"
+
+                <motion.div
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2"
                   style={{ color: '#10B981' }}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -341,8 +341,8 @@ export default function Dashboard() {
                 >
                   {stats.votesReceived}
                 </motion.div>
-                
-                <div className="text-gray-300 text-sm font-medium">
+
+                <div className="text-gray-300 text-xs sm:text-sm font-medium">
                   Votes Received
                 </div>
               </motion.div>
@@ -352,23 +352,23 @@ export default function Dashboard() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.2 }}
                 whileHover={{ scale: 1.05 }}
-                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group"
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 text-center relative overflow-hidden group"
               >
                 <motion.div
                   className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
                   style={{ backgroundColor: '#F59E0B' }}
                 />
-                
+
                 <motion.div
-                  className="text-3xl mb-3"
+                  className="text-2xl sm:text-3xl mb-2 sm:mb-3"
                   animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
                   transition={{ duration: 3, repeat: Infinity, delay: 1 }}
                 >
                   🔄
                 </motion.div>
-                
-                <motion.div 
-                  className="text-4xl font-bold mb-2"
+
+                <motion.div
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2"
                   style={{ color: '#F59E0B' }}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -376,8 +376,8 @@ export default function Dashboard() {
                 >
                   {stats.ideasInProgress}
                 </motion.div>
-                
-                <div className="text-gray-300 text-sm font-medium">
+
+                <div className="text-gray-300 text-xs sm:text-sm font-medium">
                   In Progress
                 </div>
               </motion.div>
@@ -387,23 +387,23 @@ export default function Dashboard() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.3 }}
                 whileHover={{ scale: 1.05 }}
-                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group"
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 text-center relative overflow-hidden group"
               >
                 <motion.div
                   className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
                   style={{ backgroundColor: '#8B5CF6' }}
                 />
-                
+
                 <motion.div
-                  className="text-3xl mb-3"
+                  className="text-2xl sm:text-3xl mb-2 sm:mb-3"
                   animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
                   transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
                 >
-                  🎉
+                  🚀
                 </motion.div>
-                
-                <motion.div 
-                  className="text-4xl font-bold mb-2"
+
+                <motion.div
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2"
                   style={{ color: '#8B5CF6' }}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -411,8 +411,8 @@ export default function Dashboard() {
                 >
                   {stats.ideasImplemented}
                 </motion.div>
-                
-                <div className="text-gray-300 text-sm font-medium">
+
+                <div className="text-gray-300 text-xs sm:text-sm font-medium">
                   Implemented
                 </div>
               </motion.div>
@@ -434,14 +434,14 @@ function LoadingGate() {
         className="text-center"
       >
         <motion.div
-          className="w-32 h-32 bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl"
+          className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-2xl"
           animate={{ rotate: 360, scale: [1, 1.1, 1] }}
           transition={{ rotate: { duration: 3, repeat: Infinity, ease: "linear" }, scale: { duration: 2, repeat: Infinity } }}
         >
-          <span className="text-5xl">🚀</span>
+          <span className="text-3xl sm:text-4xl md:text-5xl">🚀</span>
         </motion.div>
-        <motion.h2 
-          className="text-2xl font-bold text-white mb-4"
+        <motion.h2
+          className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -449,7 +449,7 @@ function LoadingGate() {
           Preparing Your Dashboard...
         </motion.h2>
         <motion.div
-          className="w-48 h-1 bg-white/20 rounded-full mx-auto overflow-hidden"
+          className="w-40 sm:w-48 h-1 bg-white/20 rounded-full mx-auto overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
