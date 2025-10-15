@@ -1,10 +1,147 @@
-/* Simple CSS reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+﻿@import "tailwindcss";
+
+:root {
+  --eduvos-deep: #0A1E3D;      /* Richer, deeper blue */
+  --eduvos-electric: #3B82F6;   /* Brighter electric blue */
+  --eduvos-innovation: #8B5CF6; /* Vibrant purple */
+  --eduvos-success: #10B981;    /* Emerald green */
+  --eduvos-warm: #F59E0B;       /* Golden yellow */
+  --eduvos-accent: #60A5FA;     /* Light blue accent */
 }
 
+/* Richer, more vibrant background gradient */
 body {
-  font-family: system-ui, sans-serif;
+  color: white !important;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0A1E3D 0%, #1E40AF 30%, #7C3AED 100%) !important;
+  min-height: 100vh;
+}
+
+/* Text color hierarchy - CRITICAL FOR READABILITY */
+.text-primary {
+  color: white !important;
+  font-weight: 600;
+}
+
+.text-secondary {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* DARKER glass elements for better text contrast */
+.glass-morphism {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.bg-glass-white {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.bg-glass-dark {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+.border-glass-border {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Enhanced text gradient */
+.text-gradient {
+  background: linear-gradient(135deg, #60A5FA 0%, #8B5CF6 50%, #F59E0B 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 700;
+}
+
+/* Rich shadow system */
+.shadow-glass {
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Enhanced animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes neural-glow {
+  0%, 100% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.4); }
+  50% { box-shadow: 0 0 50px rgba(139, 92, 246, 0.7); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.animate-neural-glow {
+  animation: neural-glow 3s ease-in-out infinite;
+}
+
+/* Button enhancements */
+.btn-primary {
+  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%) !important;
+  color: white !important;
+  font-weight: 600;
+  border: none !important;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Card enhancements */
+.card-glass {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 16px !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .glass-morphism {
+    backdrop-filter: blur(12px) !important;
+  }
+  
+  body {
+    background: linear-gradient(135deg, #0A1E3D 0%, #1E40AF 50%, #7C3AED 100%) !important;
+  }
+}
+
+/* Force all text to be visible */
+* {
+  color: white !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: white !important;
+  font-weight: 700;
+}
+
+p, span, div {
+  color: rgba(255, 255, 255, 0.9) !important;
 }

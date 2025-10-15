@@ -1,9 +1,11 @@
-"use client";
+﻿"use client";
 
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from "react";
 import { collection, getDocs, updateDoc, doc, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
+import Link from "next/link";
 
 interface Idea {
   id: string;
@@ -17,17 +19,54 @@ interface Idea {
 }
 
 const statusConfig = {
-  'backlog': { title: 'Backlog', color: '#6b7280', bgColor: '#f3f4f6' },
-  'validated': { title: 'Validated', color: '#1e40af', bgColor: '#dbeafe' },
-  'in-progress': { title: 'In Progress', color: '#92400e', bgColor: '#fef3c7' },
-  'implemented': { title: 'Implemented', color: '#065f46', bgColor: '#d1fae5' },
-  'rejected': { title: 'Rejected', color: '#991b1b', bgColor: '#fee2e2' }
+  'backlog': { 
+    title: 'Backlog', 
+    color: '#94a3b8', 
+    icon: '📥',
+    emoji: '💤',
+    bgGradient: 'bg-gradient-to-br from-slate-500/10 to-slate-600/15',
+    glow: 'shadow-slate-500/20'
+  },
+  'validated': { 
+    title: 'Validated', 
+    color: '#60a5fa', 
+    icon: '✅',
+    emoji: '🎯',
+    bgGradient: 'bg-gradient-to-br from-blue-500/10 to-cyan-600/15',
+    glow: 'shadow-blue-500/25'
+  },
+  'in-progress': { 
+    title: 'In Progress', 
+    color: '#fbbf24', 
+    icon: '🔄',
+    emoji: '⚡',
+    bgGradient: 'bg-gradient-to-br from-amber-500/10 to-orange-600/15',
+    glow: 'shadow-amber-500/25'
+  },
+  'implemented': { 
+    title: 'Implemented', 
+    color: '#34d399', 
+    icon: '🚀',
+    emoji: '🏆',
+    bgGradient: 'bg-gradient-to-br from-emerald-500/10 to-green-600/15',
+    glow: 'shadow-emerald-500/25'
+  },
+  'rejected': { 
+    title: 'Rejected', 
+    color: '#f87171', 
+    icon: '❌',
+    emoji: '📝',
+    bgGradient: 'bg-gradient-to-br from-rose-500/10 to-pink-600/15',
+    glow: 'shadow-rose-500/25'
+  }
 };
 
 export default function WorkflowBoard() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(true);
   const [draggedIdea, setDraggedIdea] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [activeColumn, setActiveColumn] = useState<string | null>(null);
   
   const { user } = useAuth();
 
@@ -63,28 +102,46 @@ export default function WorkflowBoard() {
   // Handle drag start
   const handleDragStart = (e: React.DragEvent, ideaId: string) => {
     setDraggedIdea(ideaId);
+    setIsDragging(true);
     e.dataTransfer.setData('text/plain', ideaId);
   };
 
-  // Handle drag over
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
+  // Handle drag end
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDraggedIdea(null);
+    setActiveColumn(null);
   };
 
-  // Handle drop
+  // Handle drag over
+  const handleDragOver = (e: React.DragEvent, status?: string) => {
+    e.preventDefault();
+    if (status) setActiveColumn(status);
+  };
+
+  // Handle drag leave
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    const relatedTarget = e.relatedTarget as Node;
+    const currentTarget = e.currentTarget as Node;
+    
+    if (!currentTarget.contains(relatedTarget)) {
+      setActiveColumn(null);
+    }
+  };
+
+  // Handle drop - FIXED: Only accepts DragEvent
   const handleDrop = async (e: React.DragEvent, newStatus: Idea['status']) => {
     e.preventDefault();
     if (!draggedIdea || !user) return;
 
     try {
-      // Update idea status in Firestore
       const ideaRef = doc(db, "ideas", draggedIdea);
       await updateDoc(ideaRef, {
         status: newStatus,
         updatedAt: new Date()
       });
 
-      // Update local state
       setIdeas(prevIdeas => 
         prevIdeas.map(idea => 
           idea.id === draggedIdea ? { ...idea, status: newStatus } : idea
@@ -92,6 +149,8 @@ export default function WorkflowBoard() {
       );
 
       setDraggedIdea(null);
+      setIsDragging(false);
+      setActiveColumn(null);
     } catch (error) {
       console.error("Error updating idea status:", error);
     }
@@ -108,220 +167,282 @@ export default function WorkflowBoard() {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.125rem' }}>Loading workflow board...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-eduvos-deep via-purple-900/80 to-blue-900/60">
+        <div className="card-glass p-8 text-center backdrop-blur-xl">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-16 h-16 border-4 border-eduvos-electric border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <div className="text-xl text-white font-light">Loading Innovation Board...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
-      {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem' }}>
-          Innovation Workflow Board
-        </h1>
-        <p style={{ color: '#6b7280' }}>
-          Drag and drop ideas between columns to update their status. 
-          {!user && ' Login to manage ideas.'}
-        </p>
-      </div>
-
-      {/* Kanban Board */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-        gap: '1.5rem',
-        alignItems: 'start'
-      }}>
-        {Object.entries(statusConfig).map(([status, config]) => (
-          <div 
-            key={status}
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, status as Idea['status'])}
-            style={{
-              background: '#f8fafc',
-              borderRadius: '0.5rem',
-              padding: '1rem',
-              minHeight: '600px',
-              border: '2px dashed #e2e8f0'
-            }}
-          >
-            {/* Column Header */}
-            <div style={{ 
-              background: config.bgColor, 
-              color: config.color,
-              padding: '0.75rem 1rem',
-              borderRadius: '0.375rem',
-              marginBottom: '1rem',
-              textAlign: 'center',
-              fontWeight: '600'
-            }}>
-              {config.title} ({ideasByStatus[status as keyof typeof ideasByStatus].length})
+    <div className="min-h-screen bg-gradient-to-br from-eduvos-deep via-purple-900/80 to-blue-900/60">
+      {/* Simple static background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-eduvos-electric/5 via-eduvos-innovation/5 to-transparent pointer-events-none" />
+      
+      <div className="relative z-10">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-glass m-6 mb-8 border border-white/10 backdrop-blur-xl"
+        >
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2 font-playfair">
+                Innovation Workflow
+              </h1>
+              <p className="text-gray-300">
+                Visualize and manage your innovation pipeline
+                {!user && ' • Login to interact'}
+              </p>
             </div>
-
-            {/* Ideas in this column */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {ideasByStatus[status as keyof typeof ideasByStatus].map((idea) => (
-                <div
-                  key={idea.id}
-                  draggable={!!user}
-                  onDragStart={(e) => handleDragStart(e, idea.id)}
-                  style={{
-                    background: 'white',
-                    borderRadius: '0.375rem',
-                    padding: '1rem',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    border: '1px solid #e5e7eb',
-                    cursor: user ? 'grab' : 'default',
-                    opacity: draggedIdea === idea.id ? 0.5 : 1,
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <h3 style={{ 
-                    fontSize: '1rem', 
-                    fontWeight: '600', 
-                    color: '#111827',
-                    marginBottom: '0.5rem',
-                    lineHeight: '1.4'
-                  }}>
-                    {idea.title}
-                  </h3>
-                  
-                  <p style={{ 
-                    color: '#6b7280', 
-                    fontSize: '0.875rem',
-                    marginBottom: '0.75rem',
-                    lineHeight: '1.4',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden'
-                  }}>
-                    {idea.description}
-                  </p>
-
-                  {/* Idea Meta */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                        By: {idea.authorEmail}
-                      </span>
-                      <span style={{ 
-                        fontSize: '0.75rem', 
-                        fontWeight: '500',
-                        color: '#374151'
-                      }}>
-                        {idea.votesCount} ?
-                      </span>
-                    </div>
-
-                    {idea.tags && idea.tags.length > 0 && (
-                      <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                        {idea.tags.slice(0, 2).map((tag, index) => (
-                          <span 
-                            key={index}
-                            style={{
-                              background: '#e5e7eb',
-                              color: '#374151',
-                              padding: '0.125rem 0.375rem',
-                              borderRadius: '0.25rem',
-                              fontSize: '0.625rem'
-                            }}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {idea.tags.length > 2 && (
-                          <span style={{
-                            background: '#e5e7eb',
-                            color: '#374151',
-                            padding: '0.125rem 0.375rem',
-                            borderRadius: '0.25rem',
-                            fontSize: '0.625rem'
-                          }}>
-                            +{idea.tags.length - 2}
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Quick Actions */}
-                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                      <a 
-                        href={`/ideas/${idea.id}`}
-                        style={{
-                          fontSize: '0.75rem',
-                          color: '#2563eb',
-                          textDecoration: 'none',
-                          fontWeight: '500'
-                        }}
-                      >
-                        View ?
-                      </a>
-                      {user && (
-                        <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                          Drag to move
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Empty state for column */}
-              {ideasByStatus[status as keyof typeof ideasByStatus].length === 0 && (
-                <div style={{
-                  textAlign: 'center',
-                  color: '#9ca3af',
-                  padding: '2rem 1rem',
-                  fontSize: '0.875rem',
-                  fontStyle: 'italic'
-                }}>
-                  No ideas in {config.title.toLowerCase()}
-                </div>
-              )}
+            
+            <div className="flex items-center gap-4 mt-4 md:mt-0">
+              <div className="flex items-center gap-2 text-gray-300">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span>{ideas.length} Active Ideas</span>
+              </div>
+              <div className="px-3 py-1 bg-eduvos-innovation/20 text-eduvos-innovation rounded-full text-sm border border-eduvos-innovation/30">
+                Live Board
+              </div>
             </div>
           </div>
-        ))}
+        </motion.div>
+
+        <div className="container mx-auto px-6 pb-12">
+          {/* Stats Overview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
+          >
+            {Object.entries(statusConfig).map(([status, config], index) => (
+              <motion.div
+                key={status}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                className={`card-glass p-4 text-center backdrop-blur-xl border border-white/5 ${config.bgGradient} rounded-xl`}
+              >
+                <div className="text-2xl mb-2">{config.emoji}</div>
+                <div className="text-2xl font-bold text-white mb-1">
+                  {ideasByStatus[status as keyof typeof ideasByStatus].length}
+                </div>
+                <div className="text-gray-300 text-sm font-medium">{config.title}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Kanban Board */}
+          <div className={`flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent ${
+            isDragging ? 'scale-95' : 'scale-100'
+          } transition-all duration-300`}>
+            <AnimatePresence>
+              {Object.entries(statusConfig).map(([status, config]) => (
+                <motion.div
+                  key={status}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex-shrink-0 w-72"
+                >
+                  {/* Column Header */}
+                  <motion.div 
+                    className={`card-glass p-4 mb-4 border-l-4 backdrop-blur-xl rounded-xl ${config.bgGradient} ${
+                      activeColumn === status ? 'ring-2 ring-white/20' : ''
+                    } transition-all duration-200`}
+                    style={{ borderLeftColor: config.color }}
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg shadow-lg"
+                          style={{ backgroundColor: config.color }}
+                        >
+                          {config.icon}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-white">{config.title}</h3>
+                          <p className="text-gray-400 text-sm">
+                            {ideasByStatus[status as keyof typeof ideasByStatus].length} items
+                          </p>
+                        </div>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm">
+                        {ideasByStatus[status as keyof typeof ideasByStatus].length}
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Column Body - FIXED: Removed onClick handler */}
+                  <motion.div
+                    onDragOver={(e) => handleDragOver(e, status)}
+                    onDrop={(e) => handleDrop(e, status as Idea['status'])}
+                    onDragLeave={handleDragLeave}
+                    className={`min-h-[600px] rounded-2xl p-3 backdrop-blur-xl border-2 border-dashed transition-all duration-300 ${
+                      activeColumn === status 
+                        ? `bg-gradient-to-br ${config.bgGradient} shadow-xl border-[${config.color}]/50` 
+                        : 'card-glass border-white/10'
+                    }`}
+                  >
+                    <div className="space-y-3 h-full">
+                      <AnimatePresence mode="popLayout">
+                        {ideasByStatus[status as keyof typeof ideasByStatus].map((idea) => (
+                          <motion.div
+                            key={idea.id}
+                            layout
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            draggable={!!user}
+                            drag={!!user}
+                            className={`card-glass p-4 rounded-xl border border-white/10 cursor-grab active:cursor-grabbing group backdrop-blur-lg ${
+                              draggedIdea === idea.id 
+                                ? 'opacity-50 scale-95' 
+                                : 'opacity-100 hover:scale-105'
+                            } transition-all duration-200 shadow-lg hover:shadow-xl ${config.glow}`}
+                            whileHover={{ y: -2 }}
+                            whileTap={{ scale: 0.98 }}
+                            onPointerDown={() => user && setDraggedIdea(idea.id)}
+                            onPointerUp={handleDragEnd}
+                          >
+                            {/* Idea Card */}
+                            <div className="space-y-3">
+                              {/* Header with votes */}
+                              <div className="flex items-start justify-between">
+                                <h4 className="font-semibold text-white text-sm leading-tight flex-1 pr-3 line-clamp-2">
+                                  {idea.title}
+                                </h4>
+                                <div className="flex items-center gap-1 bg-white/10 rounded-full px-2 py-1 border border-white/20">
+                                  <span className="text-yellow-400 text-xs">▲</span>
+                                  <span className="text-white text-sm font-bold">{idea.votesCount}</span>
+                                </div>
+                              </div>
+
+                              {/* Description */}
+                              <p className="text-gray-300 text-xs leading-relaxed line-clamp-2">
+                                {idea.description}
+                              </p>
+
+                              {/* Tags */}
+                              {idea.tags && idea.tags.length > 0 && (
+                                <div className="flex gap-1 flex-wrap">
+                                  {idea.tags.slice(0, 2).map((tag, tagIndex) => (
+                                    <span
+                                      key={tagIndex}
+                                      className="px-2 py-1 bg-white/10 text-gray-300 rounded-full text-xs border border-white/20"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                  {idea.tags.length > 2 && (
+                                    <span className="px-2 py-1 bg-white/10 text-gray-300 rounded-full text-xs border border-white/20">
+                                      +{idea.tags.length - 2}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Footer */}
+                              <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-6 h-6 bg-gradient-to-r from-eduvos-electric to-eduvos-innovation rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                    {idea.authorEmail[0].toUpperCase()}
+                                  </div>
+                                  <span className="text-gray-400 text-xs">
+                                    {idea.authorEmail.split('@')[0]}
+                                  </span>
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  <Link 
+                                    href={`/ideas/${idea.id}`}
+                                    className="text-eduvos-electric hover:text-eduvos-accent text-xs font-medium transition-colors"
+                                  >
+                                    View
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+
+                      {/* Empty State */}
+                      {ideasByStatus[status as keyof typeof ideasByStatus].length === 0 && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-center py-12 text-gray-400 rounded-xl border-2 border-dashed border-white/10"
+                        >
+                          <div className="text-3xl mb-2 opacity-50">{config.emoji}</div>
+                          <p className="text-sm font-medium">No items</p>
+                          <p className="text-xs mt-1 opacity-75">Drop ideas here</p>
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Instructions */}
+          <AnimatePresence>
+            {user ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="card-glass p-6 mt-8 border-l-4 border-l-eduvos-electric rounded-xl backdrop-blur-xl"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-2xl">💡</div>
+                  <div>
+                    <h3 className="font-semibold text-white mb-1">How to use the board</h3>
+                    <p className="text-gray-300 text-sm">
+                      Drag ideas between columns to update their status. 
+                      The flow is: <span className="text-eduvos-electric">Backlog</span> → 
+                      <span className="text-blue-400"> Validated</span> → 
+                      <span className="text-yellow-400"> In Progress</span> → 
+                      <span className="text-green-400"> Implemented</span>
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="card-glass p-6 mt-8 border-l-4 border-l-amber-400 bg-amber-400/10 rounded-xl backdrop-blur-xl"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-2xl">🔐</div>
+                  <div>
+                    <h3 className="font-semibold text-white mb-1">Login Required</h3>
+                    <p className="text-gray-300 text-sm mb-3">
+                      You need to be logged in to manage the workflow board.
+                    </p>
+                    <Link 
+                      href="/login" 
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-eduvos-electric to-eduvos-innovation text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300"
+                    >
+                      <span>Login to Continue</span>
+                      <span>→</span>
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-
-      {/* Instructions */}
-      {user && (
-        <div style={{
-          background: '#f0f9ff',
-          border: '1px solid #bae6fd',
-          borderRadius: '0.375rem',
-          padding: '1rem',
-          marginTop: '2rem',
-          textAlign: 'center'
-        }}>
-          <p style={{ color: '#0369a1', margin: 0, fontSize: '0.875rem' }}>
-            ?? <strong>How to use:</strong> Drag ideas between columns to update their status. 
-            Ideas flow from Backlog ? Validated ? In Progress ? Implemented.
-          </p>
-        </div>
-      )}
-
-      {!user && (
-        <div style={{
-          background: '#fef3c7',
-          border: '1px solid #fcd34d',
-          borderRadius: '0.375rem',
-          padding: '1rem',
-          marginTop: '2rem',
-          textAlign: 'center'
-        }}>
-          <p style={{ color: '#92400e', margin: 0, fontSize: '0.875rem' }}>
-            ?? <strong>Login required:</strong> You need to be logged in to manage the workflow board.
-            <a href="/login" style={{ color: '#dc2626', marginLeft: '0.5rem', textDecoration: 'none' }}>
-              Login here
-            </a>
-          </p>
-        </div>
-      )}
     </div>
   );
 }

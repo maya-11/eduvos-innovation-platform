@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -45,11 +46,16 @@ export default function IdeaDetail() {
   const [loading, setLoading] = useState(true);
   const [commentLoading, setCommentLoading] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   
   const { user } = useAuth();
   const params = useParams();
   const router = useRouter();
   const ideaId = params.id as string;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Fetch idea data and comments
   useEffect(() => {
@@ -57,7 +63,6 @@ export default function IdeaDetail() {
 
     const fetchIdea = async () => {
       try {
-        // Get idea data
         const ideaDoc = await getDoc(doc(db, "ideas", ideaId));
         if (!ideaDoc.exists()) {
           router.push("/ideas");
@@ -70,13 +75,11 @@ export default function IdeaDetail() {
         } as Idea;
         setIdea(ideaData);
 
-        // Check if user has voted
         if (user) {
           const voteDoc = await getDoc(doc(db, "ideas", ideaId, "votes", user.uid));
           setHasVoted(voteDoc.exists());
         }
 
-        // Listen for real-time comments
         const commentsQuery = query(
           collection(db, "ideas", ideaId, "comments"),
           orderBy("createdAt", "asc")
@@ -104,7 +107,6 @@ export default function IdeaDetail() {
     fetchIdea();
   }, [ideaId, user, router]);
 
-  // Handle voting
   const handleVote = async () => {
     if (!user || !idea) return;
 
@@ -113,7 +115,6 @@ export default function IdeaDetail() {
       const ideaRef = doc(db, "ideas", ideaId);
 
       if (hasVoted) {
-        // Remove vote
         await deleteDoc(voteRef);
         await updateDoc(ideaRef, {
           votesCount: idea.votesCount - 1
@@ -121,7 +122,6 @@ export default function IdeaDetail() {
         setHasVoted(false);
         setIdea({ ...idea, votesCount: idea.votesCount - 1 });
       } else {
-        // Add vote
         await setDoc(voteRef, { voted: true });
         await updateDoc(ideaRef, {
           votesCount: idea.votesCount + 1
@@ -134,7 +134,6 @@ export default function IdeaDetail() {
     }
   };
 
-  // Handle comment submission
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !newComment.trim()) return;
@@ -155,273 +154,554 @@ export default function IdeaDetail() {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'implemented': return 'from-green-400 to-emerald-600';
+      case 'in-progress': return 'from-yellow-400 to-amber-600';
+      case 'validated': return 'from-blue-400 to-blue-600';
+      default: return 'from-gray-400 to-gray-600';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'implemented': return '✅';
+      case 'in-progress': return '🔄';
+      case 'validated': return '🎯';
+      default: return '💡';
+    }
+  };
+
   if (loading) {
-    return (
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.125rem' }}>Loading idea...</div>
-        </div>
-      </div>
-    );
+    return <LoadingGate message="Loading brilliant idea..." />;
   }
 
   if (!idea) {
     return (
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.125rem', color: '#dc2626' }}>Idea not found</div>
-          <Link href="/ideas" style={{ color: '#2563eb', textDecoration: 'none' }}>? Back to Ideas</Link>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1E3D] to-[#7C3AED]">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-white mb-4">Idea Not Found</div>
+          <Link href="/ideas" className="text-[#60A5FA] hover:text-white transition-colors">
+            ← Back to Ideas
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      {/* Back Navigation */}
-      <div style={{ marginBottom: '2rem' }}>
-        <Link href="/ideas" style={{ color: '#2563eb', textDecoration: 'none', fontSize: '0.875rem' }}>
-          ? Back to Ideas
-        </Link>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#0A1E3D] via-purple-900/50 to-[#7C3AED]">
+      
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        {isMounted && [...Array(25)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full opacity-15"
+            style={{
+              width: Math.random() * 6 + 2,
+              height: Math.random() * 6 + 2,
+              background: `hsl(${Math.random() * 60 + 200}, 70%, 60%)`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -50, 0],
+              x: [0, Math.sin(i) * 30, 0],
+              opacity: [0.1, 0.4, 0.1],
+            }}
+            transition={{
+              duration: 8 + Math.random() * 6,
+              repeat: Infinity,
+              delay: Math.random() * 4,
+            }}
+          />
+        ))}
+
+        {/* Floating Icons */}
+        {isMounted && ['💡', '🚀', '🌟', '⚡', '🎯', '🔮'].map((icon, i) => (
+          <motion.div
+            key={icon}
+            className="absolute text-xl opacity-20"
+            style={{
+              left: `${Math.random() * 90 + 5}%`,
+              top: `${Math.random() * 90 + 5}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              rotate: [0, 180, 360],
+              scale: [0.8, 1.1, 0.8],
+            }}
+            transition={{
+              duration: 10 + i * 2,
+              repeat: Infinity,
+              delay: i * 1.5,
+            }}
+          >
+            {icon}
+          </motion.div>
+        ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
-        {/* Left Column - Idea Content */}
-        <div>
-          {/* Idea Header */}
-          <div style={{ 
-            background: 'white', 
-            borderRadius: '0.5rem', 
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            padding: '2rem',
-            marginBottom: '1.5rem'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-              <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', margin: 0 }}>
-                {idea.title}
-              </h1>
-              <span style={{
-                background: 
-                  idea.status === 'implemented' ? '#d1fae5' :
-                  idea.status === 'in-progress' ? '#fef3c7' :
-                  idea.status === 'validated' ? '#dbeafe' :
-                  '#f3f4f6',
-                color:
-                  idea.status === 'implemented' ? '#065f46' :
-                  idea.status === 'in-progress' ? '#92400e' :
-                  idea.status === 'validated' ? '#1e40af' :
-                  '#374151',
-                padding: '0.5rem 1rem',
-                borderRadius: '9999px',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                textTransform: 'capitalize'
-              }}>
-                {idea.status}
-              </span>
-            </div>
+      {/* Glowing Orbs */}
+      <motion.div
+        className="absolute top-20 left-20 w-96 h-96 bg-[#8B5CF6] rounded-full filter blur-3xl opacity-10"
+        animate={{
+          scale: [1, 1.6, 1],
+          opacity: [0.1, 0.25, 0.1],
+        }}
+        transition={{ duration: 10, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute bottom-20 right-20 w-80 h-80 bg-[#3B82F6] rounded-full filter blur-3xl opacity-10"
+        animate={{
+          scale: [1.2, 1, 1.2],
+          opacity: [0.15, 0.25, 0.15],
+        }}
+        transition={{ duration: 8, repeat: Infinity }}
+      />
 
-            {/* Voting Section */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-              <button
-                onClick={handleVote}
-                disabled={!user}
-                style={{
-                  background: hasVoted ? '#2563eb' : 'transparent',
-                  color: hasVoted ? 'white' : '#374151',
-                  border: `2px solid ${hasVoted ? '#2563eb' : '#d1d5db'}`,
-                  padding: '0.5rem 1rem',
-                  borderRadius: '0.375rem',
-                  cursor: user ? 'pointer' : 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  opacity: user ? 1 : 0.5
-                }}
-              >
-                <span style={{ fontSize: '1.125rem' }}>?</span>
-                Vote {idea.votesCount > 0 && `(${idea.votesCount})`}
-              </button>
-              {!user && (
-                <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                  Login to vote
-                </span>
-              )}
-            </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Navigation */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <Link 
+            href="/ideas" 
+            className="inline-flex items-center gap-2 text-[#60A5FA] hover:text-white transition-colors group"
+          >
+            <motion.span
+              animate={{ x: [0, -5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              ←
+            </motion.span>
+            Back to Ideas
+          </Link>
+        </motion.div>
 
-            {/* Idea Description */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#374151' }}>
-                Description
-              </h3>
-              <p style={{ color: '#6b7280', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
-                {idea.description}
-              </p>
-            </div>
-
-            {/* Tags */}
-            {idea.tags && idea.tags.length > 0 && (
-              <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#374151' }}>
-                  Tags
-                </h3>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  {idea.tags.map((tag, index) => (
-                    <span key={index} style={{
-                      background: '#e5e7eb',
-                      color: '#374151',
-                      padding: '0.375rem 0.75rem',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.875rem'
-                    }}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Comments Section */}
-          <div style={{ 
-            background: 'white', 
-            borderRadius: '0.5rem', 
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            padding: '2rem'
-          }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem', color: '#111827' }}>
-              Comments ({comments.length})
-            </h2>
-
-            {/* Add Comment Form */}
-            {user ? (
-              <form onSubmit={handleCommentSubmit} style={{ marginBottom: '2rem' }}>
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Share your thoughts on this idea..."
-                  rows={4}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '0.375rem',
-                    fontSize: '1rem',
-                    color: '#111827',
-                    resize: 'vertical',
-                    marginBottom: '1rem'
-                  }}
-                />
-                <button
-                  type="submit"
-                  disabled={commentLoading || !newComment.trim()}
-                  style={{
-                    background: '#2563eb',
-                    color: 'white',
-                    padding: '0.75rem 1.5rem',
-                    border: 'none',
-                    borderRadius: '0.375rem',
-                    cursor: commentLoading ? 'not-allowed' : 'pointer',
-                    opacity: commentLoading || !newComment.trim() ? 0.5 : 1
-                  }}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="xl:col-span-2 space-y-8">
+            {/* Idea Header Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-black/30 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 shadow-2xl"
+            >
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-6">
+                <motion.h1 
+                  className="text-4xl md:text-5xl font-bold text-white leading-tight flex-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
                 >
-                  {commentLoading ? 'Posting...' : 'Post Comment'}
-                </button>
-              </form>
-            ) : (
-              <div style={{ 
-                background: '#f3f4f6', 
-                padding: '1rem', 
-                borderRadius: '0.375rem',
-                textAlign: 'center',
-                marginBottom: '2rem'
-              }}>
-                <Link href="/login" style={{ color: '#2563eb', textDecoration: 'none' }}>
-                  Login to comment on this idea
-                </Link>
+                  {idea.title}
+                </motion.h1>
+                
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-center gap-4 shrink-0"
+                >
+                  <span className={`px-6 py-3 rounded-2xl text-sm font-bold bg-gradient-to-r ${getStatusColor(idea.status)} text-white shadow-lg capitalize flex items-center gap-2`}>
+                    <span className="text-lg">{getStatusIcon(idea.status)}</span>
+                    {idea.status.replace('-', ' ')}
+                  </span>
+                </motion.div>
               </div>
-            )}
 
-            {/* Comments List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {comments.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
-                  No comments yet. Be the first to share your thoughts!
+              {/* Voting Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-center gap-4 mb-8"
+              >
+                <motion.button
+                  onClick={handleVote}
+                  disabled={!user}
+                  whileHover={{ scale: user ? 1.05 : 1 }}
+                  whileTap={{ scale: user ? 0.95 : 1 }}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-semibold transition-all ${
+                    hasVoted 
+                      ? 'bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white shadow-lg' 
+                      : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                  } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <motion.span
+                    animate={hasVoted ? { scale: [1, 1.2, 1] } : {}}
+                    transition={{ duration: 0.5 }}
+                    className="text-xl"
+                  >
+                    {hasVoted ? '❤️' : '🤍'}
+                  </motion.span>
+                  <span>Support</span>
+                  <span className="bg-white/20 px-2 py-1 rounded-lg text-sm">
+                    {idea.votesCount}
+                  </span>
+                </motion.button>
+                
+                {!user && (
+                  <span className="text-gray-400 text-sm">
+                    Login to show your support
+                  </span>
+                )}
+              </motion.div>
+
+              {/* Idea Description */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="mb-8"
+              >
+                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                  <span>📖</span>
+                  The Vision
+                </h3>
+                <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6">
+                  <p className="text-gray-300 leading-relaxed text-lg whitespace-pre-wrap">
+                    {idea.description}
+                  </p>
                 </div>
-              ) : (
-                comments.map((comment) => (
-                  <div key={comment.id} style={{
-                    padding: '1rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.375rem'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                      <span style={{ fontWeight: '500', color: '#374151' }}>
-                        {comment.authorEmail}
-                      </span>
-                      <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                        {comment.createdAt?.toDate?.().toLocaleDateString() || 'Recently'}
-                      </span>
-                    </div>
-                    <p style={{ color: '#6b7280', lineHeight: '1.5', margin: 0 }}>
-                      {comment.text}
-                    </p>
+              </motion.div>
+
+              {/* Tags */}
+              {idea.tags && idea.tags.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                    <span>🏷️</span>
+                    Innovation Tags
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {idea.tags.map((tag, index) => (
+                      <motion.span
+                        key={index}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.7 + index * 0.1 }}
+                        className="bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg"
+                      >
+                        #{tag}
+                      </motion.span>
+                    ))}
                   </div>
-                ))
+                </motion.div>
               )}
-            </div>
-          </div>
-        </div>
+            </motion.div>
 
-        {/* Right Column - Meta Information */}
-        <div>
-          <div style={{ 
-            background: 'white', 
-            borderRadius: '0.5rem', 
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            padding: '1.5rem',
-            position: 'sticky',
-            top: '2rem'
-          }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>
-              Idea Information
-            </h3>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>Author</div>
-                <div style={{ fontWeight: '500', color: '#374151' }}>{idea.authorEmail}</div>
+            {/* Comments Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="bg-black/30 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 shadow-2xl"
+            >
+              <motion.h2 
+                className="text-3xl font-bold text-white mb-6 flex items-center gap-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <span>💬</span>
+                Community Thoughts
+                <span className="text-xl bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-transparent bg-clip-text">
+                  ({comments.length})
+                </span>
+              </motion.h2>
+
+              {/* Add Comment Form */}
+              {user ? (
+                <motion.form 
+                  onSubmit={handleCommentSubmit} 
+                  className="mb-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-1 mb-4">
+                    <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Share your brilliant thoughts on this innovation..."
+                      rows={4}
+                      className="w-full px-4 py-3 bg-transparent border-none text-white placeholder-gray-400 focus:outline-none focus:ring-0 resize-none text-lg"
+                    />
+                  </div>
+                  <motion.button
+                    type="submit"
+                    disabled={commentLoading || !newComment.trim()}
+                    whileHover={{ scale: commentLoading || !newComment.trim() ? 1 : 1.05 }}
+                    whileTap={{ scale: commentLoading || !newComment.trim() ? 1 : 0.95 }}
+                    className="bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white py-3 px-8 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+                  >
+                    {commentLoading ? (
+                      <>
+                        <motion.div
+                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        />
+                        Sharing...
+                      </>
+                    ) : (
+                      <>
+                        <span>✨</span>
+                        Share Insight
+                        <motion.span
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        >
+                          →
+                        </motion.span>
+                      </>
+                    )}
+                  </motion.button>
+                </motion.form>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 text-center mb-8"
+                >
+                  <div className="text-4xl mb-3">🔐</div>
+                  <p className="text-gray-300 mb-4">Join the conversation and share your insights</p>
+                  <Link 
+                    href="/login" 
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white py-2 px-6 rounded-xl font-semibold hover:shadow-lg transition-all"
+                  >
+                    Sign In to Comment
+                  </Link>
+                </motion.div>
+              )}
+
+              {/* Comments List */}
+              <div className="space-y-4">
+                {comments.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-12"
+                  >
+                    <div className="text-6xl mb-4">💭</div>
+                    <h3 className="text-2xl font-bold text-white mb-2">No Insights Yet</h3>
+                    <p className="text-gray-400">Be the first to share your perspective on this innovation!</p>
+                  </motion.div>
+                ) : (
+                  <AnimatePresence>
+                    {comments.map((comment, index) => (
+                      <motion.div
+                        key={comment.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all group"
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] rounded-xl flex items-center justify-center text-white font-bold text-sm">
+                              {comment.authorEmail?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-white">
+                                {comment.authorEmail}
+                              </div>
+                              <div className="text-sm text-gray-400">
+                                {comment.createdAt?.toDate?.().toLocaleDateString('en-US', { 
+                                  year: 'numeric', 
+                                  month: 'short', 
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                }) || 'Recently'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-gray-300 leading-relaxed text-lg">
+                          {comment.text}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                )}
               </div>
+            </motion.div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="xl:col-span-1">
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-black/30 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 sticky top-8 shadow-2xl"
+            >
+              <motion.h3 
+                className="text-2xl font-bold text-white mb-6 flex items-center gap-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <span>📊</span>
+                Innovation Stats
+              </motion.h3>
               
-              <div>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>Status</div>
-                <div style={{ 
-                  fontWeight: '500',
-                  color:
-                    idea.status === 'implemented' ? '#065f46' :
-                    idea.status === 'in-progress' ? '#92400e' :
-                    idea.status === 'validated' ? '#1e40af' :
-                    '#374151'
-                }}>
-                  {idea.status.charAt(0).toUpperCase() + idea.status.slice(1)}
-                </div>
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-center"
+                >
+                  <div className="text-4xl font-bold text-white mb-2">{idea.votesCount}</div>
+                  <div className="text-gray-400">Supporters</div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="text-gray-400 text-sm mb-2">Innovation Status</div>
+                  <div className={`px-4 py-3 rounded-xl bg-gradient-to-r ${getStatusColor(idea.status)} text-white font-semibold text-center flex items-center justify-center gap-2`}>
+                    <span className="text-lg">{getStatusIcon(idea.status)}</span>
+                    {idea.status.charAt(0).toUpperCase() + idea.status.slice(1)}
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <div className="text-gray-400 text-sm mb-2">Innovation Creator</div>
+                  <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] rounded-2xl flex items-center justify-center mx-auto mb-3 text-white font-bold text-xl">
+                      {idea.authorEmail?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    <div className="text-white font-semibold truncate">{idea.authorEmail}</div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <div className="text-gray-400 text-sm mb-2">Launched</div>
+                  <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4 text-center">
+                    <div className="text-white font-semibold">
+                      {idea.createdAt?.toDate?.().toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      }) || 'Recently'}
+                    </div>
+                  </div>
+                </motion.div>
               </div>
-              
-              <div>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>Votes</div>
-                <div style={{ fontWeight: '500', color: '#374151' }}>{idea.votesCount}</div>
-              </div>
-              
-              <div>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>Created</div>
-                <div style={{ fontWeight: '500', color: '#374151' }}>
-                  {idea.createdAt?.toDate?.().toLocaleDateString() || 'Recently'}
-                </div>
-              </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Beautiful Loading Component
+function LoadingGate({ message = "Loading brilliant idea..." }: { message?: string }) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1E3D] to-[#7C3AED] relative overflow-hidden">
+      {/* Animated background for loading */}
+      <div className="absolute inset-0">
+        {isMounted && [...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-white/10"
+            style={{
+              width: Math.random() * 8 + 2,
+              height: Math.random() * 8 + 2,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center relative z-10"
+      >
+        <motion.div
+          className="w-40 h-40 bg-gradient-to-r from-[#8B5CF6] via-[#3B82F6] to-[#60A5FA] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl relative"
+          animate={{ 
+            rotate: 360,
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ 
+            rotate: { duration: 4, repeat: Infinity, ease: "linear" },
+            scale: { duration: 2, repeat: Infinity }
+          }}
+        >
+          <motion.span
+            className="text-6xl"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            💡
+          </motion.span>
+          <motion.div
+            className="absolute -inset-4 border-2 border-[#8B5CF6] rounded-3xl opacity-30"
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+        </motion.div>
+        
+        <motion.h2 
+          className="text-3xl font-bold text-white mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          {message}
+        </motion.h2>
+        
+        <motion.div
+          className="w-64 h-2 bg-white/20 rounded-full mx-auto overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          <motion.div
+            className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]"
+            initial={{ x: "-100%" }}
+            animate={{ x: "100%" }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

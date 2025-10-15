@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -23,7 +24,6 @@ export default function Profile() {
   const [userIdeas, setUserIdeas] = useState<UserIdea[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   
-  // Set active tab based on URL parameter or default to 'profile'
   const initialTab = searchParams.get('tab') as 'profile' | 'ideas' | 'security' || 'profile';
   const [activeTab, setActiveTab] = useState<'profile' | 'ideas' | 'security'>(initialTab);
   
@@ -41,30 +41,21 @@ export default function Profile() {
   const [passwordMessage, setPasswordMessage] = useState("");
 
   useEffect(() => {
-    console.log("🔐 Auth state:", { user, authLoading });
-    
-    // Only redirect if auth is done loading and there's no user
     if (!authLoading && !user) {
-      console.log("🚫 No user found, redirecting to login");
       router.push("/login");
       return;
     }
 
-    // If we have a user, fetch their data
     if (user && !authLoading) {
-      console.log("👤 User found, fetching data...");
       fetchUserData();
     }
   }, [user, authLoading, router]);
 
   const fetchUserData = async () => {
     try {
-      console.log("📥 Fetching user ideas...");
-      // Fetch user's ideas - using simpler query that doesn't require composite index
       const ideasQuery = query(
         collection(db, "ideas"),
         where("authorId", "==", user!.uid)
-        // Removed orderBy to avoid index requirement for demo
       );
       const querySnapshot = await getDocs(ideasQuery);
       const ideasData: UserIdea[] = [];
@@ -80,28 +71,22 @@ export default function Profile() {
         } as UserIdea);
       });
       
-      // Sort locally by createdAt if available
       ideasData.sort((a, b) => {
         const dateA = a.createdAt?.toDate?.() || new Date(0);
         const dateB = b.createdAt?.toDate?.() || new Date(0);
-        return dateB.getTime() - dateA.getTime(); // Descending order
+        return dateB.getTime() - dateA.getTime();
       });
       
       setUserIdeas(ideasData);
-      
-      // Set form values
       setDisplayName(user!.displayName || "");
       setEmail(user!.email || "");
-      
-      console.log("✅ User data loaded successfully, ideas found:", ideasData.length);
     } catch (error) {
-      console.error("❌ Error fetching user data:", error);
+      console.error("Error fetching user data:", error);
     } finally {
       setDataLoading(false);
     }
   };
 
-  // Update URL when tab changes
   useEffect(() => {
     const url = new URL(window.location.href);
     if (activeTab === 'profile') {
@@ -125,21 +110,18 @@ export default function Profile() {
 
     try {
       if (user) {
-        console.log("📝 Updating profile...");
-        // Update user profile
         await updateProfile(user, {
           displayName: displayName.trim()
         });
         
         setProfileMessage("✅ Profile updated successfully!");
         
-        // Refresh the page to show updated display name
         setTimeout(() => {
           window.location.reload();
         }, 1500);
       }
     } catch (error: any) {
-      console.error("❌ Error updating profile:", error);
+      console.error("Error updating profile:", error);
       setProfileMessage(`Error: ${error.message}`);
     } finally {
       setProfileLoading(false);
@@ -164,12 +146,8 @@ export default function Profile() {
 
     try {
       if (user && user.email) {
-        console.log("🔐 Updating password...");
-        // Reauthenticate user
         const credential = EmailAuthProvider.credential(user.email, currentPassword);
         await reauthenticateWithCredential(user, credential);
-        
-        // Update password
         await updatePassword(user, newPassword);
         
         setPasswordMessage("✅ Password updated successfully!");
@@ -178,507 +156,567 @@ export default function Profile() {
         setConfirmPassword("");
       }
     } catch (error: any) {
-      console.error("❌ Error updating password:", error);
+      console.error("Error updating password:", error);
       setPasswordMessage(`Error: ${error.message}`);
     } finally {
       setPasswordLoading(false);
     }
   };
 
-  // Show loading while auth is being checked
+  // Loading states
   if (authLoading) {
-    return (
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.125rem' }}>Checking authentication...</div>
-        </div>
-      </div>
-    );
+    return <LoadingGate message="Checking authentication..." />;
   }
 
-  // Show loading while user data is being fetched
   if (dataLoading && user) {
-    return (
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.125rem' }}>Loading your profile...</div>
-        </div>
-      </div>
-    );
+    return <LoadingGate message="Loading your magnificent profile..." />;
   }
 
-  // Don't render anything if no user (will redirect)
   if (!user) {
     return null;
   }
 
-  // User stats - removed avg votes as requested
+  // User stats
   const userStats = {
     totalIdeas: userIdeas.length,
     implementedIdeas: userIdeas.filter(idea => idea.status === 'implemented').length,
     totalVotes: userIdeas.reduce((sum, idea) => sum + idea.votesCount, 0)
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'implemented': return 'from-green-400 to-emerald-600';
+      case 'in-progress': return 'from-yellow-400 to-amber-600';
+      case 'validated': return 'from-blue-400 to-blue-600';
+      default: return 'from-gray-400 to-gray-600';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'implemented': return 'Implemented';
+      case 'in-progress': return 'In Progress';
+      case 'validated': return 'Validated';
+      default: return 'Backlog';
+    }
+  };
+
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem' }}>
-          Your Profile
-        </h1>
-        <p style={{ color: '#6b7280' }}>
-          Manage your account settings and view your contributions
-        </p>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#0A1E3D] via-purple-900/50 to-[#7C3AED]">
+      
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full opacity-10"
+            style={{
+              width: Math.random() * 8 + 2,
+              height: Math.random() * 8 + 2,
+              background: `hsl(${Math.random() * 60 + 200}, 70%, 60%)`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -40, 0],
+              x: [0, 20, 0],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 6 + Math.random() * 4,
+              repeat: Infinity,
+              delay: Math.random() * 3,
+            }}
+          />
+        ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
-        {/* Sidebar */}
-        <div>
-          <div style={{
-            background: 'white',
-            borderRadius: '0.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            padding: '1.5rem',
-            position: 'sticky',
-            top: '2rem'
-          }}>
-            {/* User Info */}
-            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <div style={{
-                width: '80px',
-                height: '80px',
-                background: '#2563eb',
-                color: 'white',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                margin: '0 auto 1rem'
-              }}>
-                {(user.displayName || user.email?.charAt(0) || 'U').toUpperCase()}
-              </div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.25rem' }}>
-                {user.displayName || 'User'}
-              </h3>
-              <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                {user.email}
-              </p>
-            </div>
+      {/* Glowing Orbs */}
+      <motion.div
+        className="absolute top-20 left-20 w-96 h-96 bg-[#8B5CF6] rounded-full filter blur-3xl opacity-10"
+        animate={{
+          scale: [1, 1.4, 1],
+          opacity: [0.1, 0.2, 0.1],
+        }}
+        transition={{ duration: 8, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute bottom-20 right-20 w-80 h-80 bg-[#3B82F6] rounded-full filter blur-3xl opacity-10"
+        animate={{
+          scale: [1.2, 1, 1.2],
+          opacity: [0.1, 0.15, 0.1],
+        }}
+        transition={{ duration: 6, repeat: Infinity }}
+      />
 
-            {/* Stats - removed avg votes */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 1fr)', 
-              gap: '0.75rem',
-              marginBottom: '1.5rem'
-            }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#2563eb' }}>
-                  {userStats.totalIdeas}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Ideas</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#059669' }}>
-                  {userStats.implementedIdeas}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Implemented</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#d97706' }}>
-                  {userStats.totalVotes}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Votes</div>
-              </div>
-            </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <motion.h1 
+            className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-[#60A5FA] to-[#8B5CF6] bg-clip-text text-transparent mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            Your Innovation Profile
+          </motion.h1>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            Showcasing your journey as an Eduvos innovator
+          </motion.p>
+        </motion.div>
 
-            {/* Navigation */}
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {(['profile', 'ideas', 'security'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  style={{
-                    background: activeTab === tab ? '#2563eb' : 'transparent',
-                    color: activeTab === tab ? 'white' : '#374151',
-                    border: 'none',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '0.375rem',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    fontSize: '0.875rem',
-                    fontWeight: '500'
-                  }}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
-            </nav>
-
-            <button
-              onClick={async () => {
-                console.log("🚪 Logging out...");
-                await logout();
-                router.push("/login");
-              }}
-              style={{
-                background: 'transparent',
-                color: '#dc2626',
-                border: '1px solid #dc2626',
-                padding: '0.75rem 1rem',
-                borderRadius: '0.375rem',
-                cursor: 'pointer',
-                marginTop: '1rem',
-                width: '100%',
-                fontSize: '0.875rem',
-                fontWeight: '500'
-              }}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-6 sticky top-8"
             >
-              Logout
-            </button>
+              {/* User Avatar */}
+              <motion.div 
+                className="text-center mb-6"
+                whileHover={{ scale: 1.05 }}
+              >
+                <div className="relative inline-block">
+                  <motion.div
+                    className="w-24 h-24 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl"
+                    animate={{ 
+                      rotate: [0, 5, 0, -5, 0],
+                      scale: [1, 1.02, 1]
+                    }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  >
+                    <span className="text-3xl font-bold text-white">
+                      {(user.displayName || user.email?.charAt(0) || 'U').toUpperCase()}
+                    </span>
+                  </motion.div>
+                  <motion.div
+                    className="absolute -inset-2 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] rounded-2xl opacity-20 blur-lg -z-10"
+                    animate={{ opacity: [0.2, 0.4, 0.2] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                </div>
+                
+                <motion.h3 
+                  className="text-xl font-bold text-white mb-1 truncate px-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  {user.displayName || 'Innovation Star'}
+                </motion.h3>
+                <p className="text-gray-400 text-sm truncate px-2">
+                  {user.email}
+                </p>
+              </motion.div>
+
+              {/* Stats */}
+              <motion.div 
+                className="grid grid-cols-3 gap-4 mb-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                {[
+                  { value: userStats.totalIdeas, label: 'Ideas', color: 'from-blue-500 to-cyan-500' },
+                  { value: userStats.implementedIdeas, label: 'Done', color: 'from-green-500 to-emerald-500' },
+                  { value: userStats.totalVotes, label: 'Votes', color: 'from-purple-500 to-pink-500' },
+                ].map((stat, index) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                    className="text-center"
+                  >
+                    <div className={`bg-gradient-to-r ${stat.color} text-white p-3 rounded-xl shadow-lg`}>
+                      <div className="text-lg font-bold">{stat.value}</div>
+                      <div className="text-xs opacity-90">{stat.label}</div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Navigation */}
+              <nav className="space-y-2">
+                {(['profile', 'ideas', 'security'] as const).map((tab) => (
+                  <motion.button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`w-full text-left p-3 rounded-xl font-semibold transition-all ${
+                      activeTab === tab
+                        ? 'bg-white/20 text-white shadow-lg'
+                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <span className="capitalize">{tab}</span>
+                  </motion.button>
+                ))}
+              </nav>
+
+              {/* Logout Button */}
+              <motion.button
+                onClick={async () => {
+                  await logout();
+                  router.push("/login");
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full mt-4 p-3 bg-red-500/20 border border-red-500/50 text-red-200 rounded-xl font-semibold hover:bg-red-500/30 transition-all"
+              >
+                🚪 Sign Out
+              </motion.button>
+            </motion.div>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            <AnimatePresence mode="wait">
+              {/* Profile Tab */}
+              {activeTab === 'profile' && (
+                <motion.div
+                  key="profile"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-8"
+                >
+                  <motion.h2 
+                    className="text-3xl font-bold text-white mb-6 flex items-center gap-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <span>👤</span>
+                    Profile Information
+                  </motion.h2>
+                  
+                  <form onSubmit={handleProfileUpdate} className="space-y-6">
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <label className="block text-white font-semibold mb-3">
+                        Display Name
+                      </label>
+                      <input
+                        type="text"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] focus:border-transparent backdrop-blur-lg"
+                        placeholder="Enter your display name"
+                        maxLength={50}
+                      />
+                      <div className="text-right text-sm text-gray-400 mt-1">
+                        {displayName.length}/50 characters
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <label className="block text-white font-semibold mb-3">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={email}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-gray-400 cursor-not-allowed backdrop-blur-lg truncate"
+                        disabled
+                      />
+                      <p className="text-gray-400 text-sm mt-2">
+                        Email cannot be changed for security reasons
+                      </p>
+                    </motion.div>
+
+                    {profileMessage && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`p-4 rounded-xl backdrop-blur-lg ${
+                          profileMessage.includes('✅') 
+                            ? 'bg-green-500/20 border border-green-500/50 text-green-200'
+                            : 'bg-red-500/20 border border-red-500/50 text-red-200'
+                        }`}
+                      >
+                        {profileMessage}
+                      </motion.div>
+                    )}
+
+                    <motion.button
+                      type="submit"
+                      disabled={profileLoading}
+                      whileHover={{ scale: profileLoading ? 1 : 1.02 }}
+                      whileTap={{ scale: profileLoading ? 1 : 0.98 }}
+                      className="bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {profileLoading ? (
+                        <span className="flex items-center gap-2">
+                          <motion.div
+                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          />
+                          Updating...
+                        </span>
+                      ) : (
+                        '✨ Update Profile'
+                      )}
+                    </motion.button>
+                  </form>
+                </motion.div>
+              )}
+
+              {/* Ideas Tab */}
+              {activeTab === 'ideas' && (
+                <motion.div
+                  key="ideas"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-8"
+                >
+                  <motion.h2 
+                    className="text-3xl font-bold text-white mb-6 flex items-center gap-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <span>💡</span>
+                    Your Innovation Portfolio ({userIdeas.length})
+                  </motion.h2>
+                  
+                  {userIdeas.length === 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="text-center py-12"
+                    >
+                      <div className="text-6xl mb-4">🌱</div>
+                      <h3 className="text-2xl font-bold text-white mb-2">No Ideas Yet</h3>
+                      <p className="text-gray-400 mb-6">Start your innovation journey by submitting your first brilliant idea!</p>
+                      <motion.a
+                        href="/ideas/new"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-block bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                      >
+                        🚀 Launch First Idea
+                      </motion.a>
+                    </motion.div>
+                  ) : (
+                    <div className="grid gap-4">
+                      {userIdeas.map((idea, index) => (
+                        <motion.div
+                          key={idea.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          whileHover={{ scale: 1.02 }}
+                          className="bg-white/10 backdrop-blur-lg border border-white/15 rounded-xl p-6 hover:border-white/30 transition-all group"
+                        >
+                          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 min-w-0">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-[#60A5FA] transition-colors truncate">
+                                {idea.title}
+                              </h3>
+                              <div className="flex flex-wrap gap-3 items-center">
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${getStatusColor(idea.status)} text-white shadow-lg whitespace-nowrap`}>
+                                  {getStatusText(idea.status)}
+                                </span>
+                                <span className="text-gray-300 text-sm flex items-center gap-1 whitespace-nowrap">
+                                  ❤️ {idea.votesCount} {idea.votesCount === 1 ? 'vote' : 'votes'}
+                                </span>
+                                <span className="text-gray-400 text-sm whitespace-nowrap">
+                                  {idea.createdAt?.toDate?.().toLocaleDateString() || 'Recently'}
+                                </span>
+                              </div>
+                            </div>
+                            <motion.a
+                              href={`/ideas/${idea.id}`}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="bg-white/20 hover:bg-white/30 text-white py-2 px-4 rounded-lg font-semibold transition-all border border-white/30 hover:border-white/50 flex items-center gap-2 whitespace-nowrap shrink-0"
+                            >
+                              View Details
+                              <motion.span
+                                animate={{ x: [0, 5, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                              >
+                                →
+                              </motion.span>
+                            </motion.a>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {/* Security Tab */}
+              {activeTab === 'security' && (
+                <motion.div
+                  key="security"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-8"
+                >
+                  <motion.h2 
+                    className="text-3xl font-bold text-white mb-6 flex items-center gap-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <span>🔒</span>
+                    Security Settings
+                  </motion.h2>
+                  
+                  <form onSubmit={handlePasswordUpdate} className="space-y-6">
+                    {[
+                      {
+                        label: 'Current Password',
+                        value: currentPassword,
+                        onChange: setCurrentPassword,
+                        type: 'password'
+                      },
+                      {
+                        label: 'New Password',
+                        value: newPassword,
+                        onChange: setNewPassword,
+                        type: 'password'
+                      },
+                      {
+                        label: 'Confirm New Password',
+                        value: confirmPassword,
+                        onChange: setConfirmPassword,
+                        type: 'password'
+                      }
+                    ].map((field, index) => (
+                      <motion.div
+                        key={field.label}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + index * 0.1 }}
+                      >
+                        <label className="block text-white font-semibold mb-3">
+                          {field.label}
+                        </label>
+                        <input
+                          type={field.type}
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] focus:border-transparent backdrop-blur-lg"
+                          required
+                        />
+                      </motion.div>
+                    ))}
+
+                    {passwordMessage && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`p-4 rounded-xl backdrop-blur-lg ${
+                          passwordMessage.includes('✅') 
+                            ? 'bg-green-500/20 border border-green-500/50 text-green-200'
+                            : 'bg-red-500/20 border border-red-500/50 text-red-200'
+                        }`}
+                      >
+                        {passwordMessage}
+                      </motion.div>
+                    )}
+
+                    <motion.button
+                      type="submit"
+                      disabled={passwordLoading}
+                      whileHover={{ scale: passwordLoading ? 1 : 1.02 }}
+                      whileTap={{ scale: passwordLoading ? 1 : 0.98 }}
+                      className="bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {passwordLoading ? (
+                        <span className="flex items-center gap-2">
+                          <motion.div
+                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          />
+                          Securing...
+                        </span>
+                      ) : (
+                        '🛡️ Update Password'
+                      )}
+                    </motion.button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
-
-        {/* Main Content */}
-        <div>
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <div style={{
-              background: 'white',
-              borderRadius: '0.5rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              padding: '2rem'
-            }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem', color: '#111827' }}>
-                Profile Information
-              </h2>
-              
-              <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontWeight: '500',
-                    marginBottom: '0.5rem',
-                    color: '#374151',
-                    fontSize: '0.875rem'
-                  }}>
-                    Display Name
-                  </label>
-                  <input
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '1rem',
-                      color: '#111827'
-                    }}
-                    placeholder="Enter your display name"
-                  />
-                </div>
-
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontWeight: '500',
-                    marginBottom: '0.5rem',
-                    color: '#374151',
-                    fontSize: '0.875rem'
-                  }}>
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '1rem',
-                      color: '#111827',
-                      background: '#f9fafb',
-                      cursor: 'not-allowed'
-                    }}
-                    disabled
-                  />
-                  <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
-                    Email cannot be changed for security reasons
-                  </p>
-                </div>
-
-                {profileMessage && (
-                  <div style={{
-                    padding: '0.75rem 1rem',
-                    borderRadius: '0.375rem',
-                    background: profileMessage.includes('✅') ? '#f0fdf4' : '#fef2f2',
-                    border: `1px solid ${profileMessage.includes('✅') ? '#bbf7d0' : '#fecaca'}`,
-                    color: profileMessage.includes('✅') ? '#16a34a' : '#dc2626',
-                    fontSize: '0.875rem'
-                  }}>
-                    {profileMessage}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={profileLoading}
-                  style={{
-                    background: '#2563eb',
-                    color: 'white',
-                    padding: '0.75rem 1.5rem',
-                    border: 'none',
-                    borderRadius: '0.375rem',
-                    cursor: profileLoading ? 'not-allowed' : 'pointer',
-                    fontWeight: '500',
-                    alignSelf: 'flex-start',
-                    opacity: profileLoading ? 0.5 : 1
-                  }}
-                >
-                  {profileLoading ? 'Updating...' : 'Update Profile'}
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Ideas Tab */}
-          {activeTab === 'ideas' && (
-            <div style={{
-              background: 'white',
-              borderRadius: '0.5rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              padding: '2rem'
-            }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem', color: '#111827' }}>
-                Your Ideas ({userIdeas.length})
-              </h2>
-              
-              {userIdeas.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '3rem 2rem', color: '#6b7280' }}>
-                  <p style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>You haven't submitted any ideas yet.</p>
-                  <a 
-                    href="/ideas/new"
-                    style={{
-                      background: '#2563eb',
-                      color: 'white',
-                      padding: '0.75rem 1.5rem',
-                      borderRadius: '0.375rem',
-                      textDecoration: 'none',
-                      fontWeight: '500',
-                      display: 'inline-block'
-                    }}
-                  >
-                    Submit Your First Idea
-                  </a>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {userIdeas.map((idea) => (
-                    <div key={idea.id} style={{
-                      padding: '1.5rem',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '0.375rem',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      background: 'white',
-                      transition: 'all 0.2s ease'
-                    }}>
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                          {idea.title}
-                        </h3>
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                          <span style={{
-                            background: 
-                              idea.status === 'implemented' ? '#d1fae5' :
-                              idea.status === 'in-progress' ? '#fef3c7' :
-                              idea.status === 'validated' ? '#dbeafe' :
-                              '#f3f4f6',
-                            color:
-                              idea.status === 'implemented' ? '#065f46' :
-                              idea.status === 'in-progress' ? '#92400e' :
-                              idea.status === 'validated' ? '#1e40af' :
-                              '#374151',
-                            padding: '0.25rem 0.75rem',
-                            borderRadius: '9999px',
-                            fontSize: '0.75rem',
-                            fontWeight: '500',
-                            textTransform: 'capitalize'
-                          }}>
-                            {idea.status.replace('-', ' ')}
-                          </span>
-                          <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                            {idea.votesCount} {idea.votesCount === 1 ? 'vote' : 'votes'}
-                          </span>
-                          <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                            {idea.createdAt?.toDate?.().toLocaleDateString() || 'Recently'}
-                          </span>
-                        </div>
-                      </div>
-                      <a 
-                        href={`/ideas/${idea.id}`}
-                        style={{
-                          color: '#2563eb',
-                          textDecoration: 'none',
-                          fontWeight: '500',
-                          fontSize: '0.875rem',
-                          whiteSpace: 'nowrap',
-                          marginLeft: '1rem',
-                          padding: '0.5rem 1rem',
-                          border: '1px solid #2563eb',
-                          borderRadius: '0.375rem',
-                          transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = '#2563eb';
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'transparent';
-                          e.currentTarget.style.color = '#2563eb';
-                        }}
-                      >
-                        View Details →
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Security Tab */}
-          {activeTab === 'security' && (
-            <div style={{
-              background: 'white',
-              borderRadius: '0.5rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              padding: '2rem'
-            }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem', color: '#111827' }}>
-                Security Settings
-              </h2>
-              
-              <form onSubmit={handlePasswordUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontWeight: '500',
-                    marginBottom: '0.5rem',
-                    color: '#374151',
-                    fontSize: '0.875rem'
-                  }}>
-                    Current Password
-                  </label>
-                  <input
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '1rem',
-                      color: '#111827'
-                    }}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontWeight: '500',
-                    marginBottom: '0.5rem',
-                    color: '#374151',
-                    fontSize: '0.875rem'
-                  }}>
-                    New Password
-                  </label>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '1rem',
-                      color: '#111827'
-                    }}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label style={{
-                    display: 'block',
-                    fontWeight: '500',
-                    marginBottom: '0.5rem',
-                    color: '#374151',
-                    fontSize: '0.875rem'
-                  }}>
-                    Confirm New Password
-                  </label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '1rem',
-                      color: '#111827'
-                    }}
-                    required
-                  />
-                </div>
-
-                {passwordMessage && (
-                  <div style={{
-                    padding: '0.75rem 1rem',
-                    borderRadius: '0.375rem',
-                    background: passwordMessage.includes('✅') ? '#f0fdf4' : '#fef2f2',
-                    border: `1px solid ${passwordMessage.includes('✅') ? '#bbf7d0' : '#fecaca'}`,
-                    color: passwordMessage.includes('✅') ? '#16a34a' : '#dc2626',
-                    fontSize: '0.875rem'
-                  }}>
-                    {passwordMessage}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={passwordLoading}
-                  style={{
-                    background: '#2563eb',
-                    color: 'white',
-                    padding: '0.75rem 1.5rem',
-                    border: 'none',
-                    borderRadius: '0.375rem',
-                    cursor: passwordLoading ? 'not-allowed' : 'pointer',
-                    fontWeight: '500',
-                    alignSelf: 'flex-start',
-                    opacity: passwordLoading ? 0.5 : 1
-                  }}
-                >
-                  {passwordLoading ? 'Updating...' : 'Update Password'}
-                </button>
-              </form>
-            </div>
-          )}
-        </div>
       </div>
+    </div>
+  );
+}
+
+// Enhanced Loading Component
+function LoadingGate({ message = "Loading..." }: { message?: string }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1E3D] to-[#7C3AED]">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center"
+      >
+        <motion.div
+          className="w-32 h-32 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl"
+          animate={{ 
+            rotate: 360,
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ 
+            rotate: { duration: 3, repeat: Infinity, ease: "linear" },
+            scale: { duration: 2, repeat: Infinity }
+          }}
+        >
+          <span className="text-5xl">🌟</span>
+        </motion.div>
+        <motion.h2 
+          className="text-2xl font-bold text-white mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          {message}
+        </motion.h2>
+        <motion.div
+          className="w-48 h-1 bg-white/20 rounded-full mx-auto overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          <motion.div
+            className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]"
+            initial={{ x: "-100%" }}
+            animate={{ x: "100%" }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

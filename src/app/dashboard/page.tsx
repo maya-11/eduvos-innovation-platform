@@ -1,10 +1,12 @@
-"use client";
+'use client';
 
+import { motion } from 'framer-motion';
 import { useAuth } from "@/lib/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import Link from 'next/link';
 
 interface UserStats {
   ideasSubmitted: number;
@@ -36,7 +38,6 @@ export default function Dashboard() {
       if (!user) return;
 
       try {
-        // Get all ideas submitted by this user
         const userIdeasQuery = query(
           collection(db, "ideas"),
           where("authorId", "==", user.uid)
@@ -80,11 +81,7 @@ export default function Dashboard() {
   }, [user]);
 
   if (authLoading || loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <div style={{ fontSize: '1.125rem' }}>Loading dashboard...</div>
-      </div>
-    );
+    return <LoadingGate />;
   }
 
   if (!user) {
@@ -92,184 +89,379 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#111827' }}>Dashboard</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ color: '#374151' }}>Welcome, {user.email}</span>
-          <button 
-            onClick={logout}
-            style={{
-              background: '#dc2626',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              border: 'none',
-              borderRadius: '0.375rem',
-              cursor: 'pointer'
-            }}
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#0A1E3D] via-purple-900/50 to-[#7C3AED]">
       
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-        gap: '1.5rem',
-        marginBottom: '2rem'
-      }}>
-        <div style={{
-          background: 'white',
-          padding: '1.5rem',
-          borderRadius: '0.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-        }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>Submit New Idea</h3>
-          <p style={{ color: '#6b7280', marginBottom: '1rem' }}>Share your innovative ideas with the community</p>
-          <a href="/ideas/new" style={{
-            background: '#2563eb',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '0.375rem',
-            textDecoration: 'none',
-            display: 'inline-block'
-          }}>
-            Submit Idea
-          </a>
-        </div>
-        
-        <div style={{
-          background: 'white',
-          padding: '1.5rem',
-          borderRadius: '0.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-        }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>Browse Ideas</h3>
-          <p style={{ color: '#6b7280', marginBottom: '1rem' }}>Explore ideas submitted by others</p>
-          <a href="/ideas" style={{
-            background: '#059669',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '0.375rem',
-            textDecoration: 'none',
-            display: 'inline-block'
-          }}>
-            View Ideas
-          </a>
-        </div>
-        
-        <div style={{
-          background: 'white',
-          padding: '1.5rem',
-          borderRadius: '0.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-        }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>My Submissions</h3>
-          <p style={{ color: '#6b7280', marginBottom: '1rem' }}>Manage your submitted ideas</p>
-          <a href="/profile?tab=ideas" style={{
-            background: '#7c3aed',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '0.375rem',
-            textDecoration: 'none',
-            display: 'inline-block',
-            cursor: 'pointer'
-          }}>
-            My Submissions
-          </a>
-        </div>
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full opacity-15"
+            style={{
+              width: Math.random() * 6 + 2,
+              height: Math.random() * 6 + 2,
+              background: 'hsl(210, 70%, 60%)',
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -60, 0],
+              x: [0, 20, 0],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 5 + Math.random() * 6,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
       </div>
 
-      <div style={{
-        background: 'white',
-        borderRadius: '0.5rem',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        padding: '1.5rem'
-      }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Your Quick Stats</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-          <div style={{ textAlign: 'center', background: '#dbeafe', borderRadius: '0.375rem', padding: '1rem' }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb' }}>{stats.ideasSubmitted}</div>
-            <div style={{ fontSize: '0.875rem', color: '#374151' }}>Ideas Submitted</div>
-          </div>
-          <div style={{ textAlign: 'center', background: '#d1fae5', borderRadius: '0.375rem', padding: '1rem' }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#059669' }}>{stats.votesReceived}</div>
-            <div style={{ fontSize: '0.875rem', color: '#374151' }}>Votes Received</div>
-          </div>
-          <div style={{ textAlign: 'center', background: '#fef3c7', borderRadius: '0.375rem', padding: '1rem' }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706' }}>{stats.ideasInProgress}</div>
-            <div style={{ fontSize: '0.875rem', color: '#374151' }}>In Progress</div>
-          </div>
-          <div style={{ textAlign: 'center', background: '#f3e8ff', borderRadius: '0.375rem', padding: '1rem' }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7c3aed' }}>{stats.ideasImplemented}</div>
-            <div style={{ fontSize: '0.875rem', color: '#374151' }}>Implemented</div>
-          </div>
-        </div>
-      </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <motion.h1 
+            className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-[#60A5FA] to-[#8B5CF6] bg-clip-text text-transparent mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            Innovation Hub
+          </motion.h1>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            Your gateway to creativity, collaboration, and groundbreaking ideas at Eduvos
+          </motion.p>
+        </motion.div>
 
-      {/* Recent Activity Section */}
-      <div style={{
-        background: 'white',
-        borderRadius: '0.5rem',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        padding: '1.5rem',
-        marginTop: '2rem'
-      }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Quick Actions</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-          <a href="/board" style={{
-            background: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            padding: '1rem',
-            borderRadius: '0.375rem',
-            textDecoration: 'none',
-            color: '#374151',
-            textAlign: 'center',
-            fontWeight: '500'
-          }}>
-             Workflow Board
-          </a>
-          <a href="/profile" style={{
-            background: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            padding: '1rem',
-            borderRadius: '0.375rem',
-            textDecoration: 'none',
-            color: '#374151',
-            textAlign: 'center',
-            fontWeight: '500'
-          }}>
-            Your Profile
-          </a>
-          <a href="/ideas/new" style={{
-            background: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            padding: '1rem',
-            borderRadius: '0.375rem',
-            textDecoration: 'none',
-            color: '#374151',
-            textAlign: 'center',
-            fontWeight: '500'
-          }}>
-            New Idea
-          </a>
-          {user.email?.includes('admin') && (
-            <a href="/admin" style={{
-              background: '#fef3c7',
-              border: '1px solid #fcd34d',
-              padding: '1rem',
-              borderRadius: '0.375rem',
-              textDecoration: 'none',
-              color: '#92400e',
-              textAlign: 'center',
-              fontWeight: '500'
-            }}>
-              Admin Panel
-            </a>
-          )}
-        </div>
+        {/* Quick Actions Grid */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+            className="relative group"
+          >
+            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-6 h-full transition-all duration-300 group-hover:border-white/30">
+              <motion.div
+                className="w-16 h-16 bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg"
+                animate={{ rotate: [0, 5, 0, -5, 0], scale: [1, 1.05, 1] }}
+                transition={{ duration: 4, repeat: Infinity }}
+              >
+                <span className="text-2xl">💡</span>
+              </motion.div>
+              
+              <h3 className="text-xl font-bold text-white text-center mb-2">
+                Submit New Idea
+              </h3>
+              <p className="text-gray-400 text-center mb-4">
+                Share your innovative ideas with the Eduvos community
+              </p>
+              
+              <Link href="/ideas/new">
+                <motion.button
+                  className="w-full bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] text-white py-3 rounded-xl font-semibold transition-all shadow-lg"
+                  whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(59, 130, 246, 0.4)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Get Started
+                </motion.button>
+              </Link>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+            className="relative group"
+          >
+            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-6 h-full transition-all duration-300 group-hover:border-white/30">
+              <motion.div
+                className="w-16 h-16 bg-gradient-to-r from-[#10B981] to-[#047857] rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg"
+                animate={{ rotate: [0, 5, 0, -5, 0], scale: [1, 1.05, 1] }}
+                transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
+              >
+                <span className="text-2xl">🔍</span>
+              </motion.div>
+              
+              <h3 className="text-xl font-bold text-white text-center mb-2">
+                Browse Ideas
+              </h3>
+              <p className="text-gray-400 text-center mb-4">
+                Explore innovative ideas from the community
+              </p>
+              
+              <Link href="/ideas">
+                <motion.button
+                  className="w-full bg-gradient-to-r from-[#10B981] to-[#047857] text-white py-3 rounded-xl font-semibold transition-all shadow-lg"
+                  whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(16, 185, 129, 0.4)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Get Started
+                </motion.button>
+              </Link>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#10B981] to-[#047857] rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+            className="relative group"
+          >
+            <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-6 h-full transition-all duration-300 group-hover:border-white/30">
+              <motion.div
+                className="w-16 h-16 bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg"
+                animate={{ rotate: [0, 5, 0, -5, 0], scale: [1, 1.05, 1] }}
+                transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+              >
+                <span className="text-2xl">📊</span>
+              </motion.div>
+              
+              <h3 className="text-xl font-bold text-white text-center mb-2">
+                My Submissions
+              </h3>
+              <p className="text-gray-400 text-center mb-4">
+                Manage and track your submitted ideas
+              </p>
+              
+              <Link href="/profile?tab=ideas">
+                <motion.button
+                  className="w-full bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] text-white py-3 rounded-xl font-semibold transition-all shadow-lg"
+                  whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(139, 92, 246, 0.4)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Get Started
+                </motion.button>
+              </Link>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] rounded-2xl opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-300 -z-10" />
+          </motion.div>
+        </motion.section>
+
+        {/* Stats Dashboard */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mb-12"
+        >
+          <div className="bg-black/25 backdrop-blur-xl border border-white/15 rounded-2xl p-8">
+            <motion.h2 
+              className="text-3xl font-bold text-white mb-8 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9 }}
+            >
+              Your Innovation Impact
+            </motion.h2>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.0 }}
+                whileHover={{ scale: 1.05 }}
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group"
+              >
+                <motion.div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  style={{ backgroundColor: '#3B82F6' }}
+                />
+                
+                <motion.div
+                  className="text-3xl mb-3"
+                  animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  📝
+                </motion.div>
+                
+                <motion.div 
+                  className="text-4xl font-bold mb-2"
+                  style={{ color: '#3B82F6' }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, delay: 1.1 }}
+                >
+                  {stats.ideasSubmitted}
+                </motion.div>
+                
+                <div className="text-gray-300 text-sm font-medium">
+                  Ideas Submitted
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.1 }}
+                whileHover={{ scale: 1.05 }}
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group"
+              >
+                <motion.div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  style={{ backgroundColor: '#10B981' }}
+                />
+                
+                <motion.div
+                  className="text-3xl mb-3"
+                  animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+                >
+                  👍
+                </motion.div>
+                
+                <motion.div 
+                  className="text-4xl font-bold mb-2"
+                  style={{ color: '#10B981' }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, delay: 1.2 }}
+                >
+                  {stats.votesReceived}
+                </motion.div>
+                
+                <div className="text-gray-300 text-sm font-medium">
+                  Votes Received
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.2 }}
+                whileHover={{ scale: 1.05 }}
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group"
+              >
+                <motion.div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  style={{ backgroundColor: '#F59E0B' }}
+                />
+                
+                <motion.div
+                  className="text-3xl mb-3"
+                  animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                >
+                  🔄
+                </motion.div>
+                
+                <motion.div 
+                  className="text-4xl font-bold mb-2"
+                  style={{ color: '#F59E0B' }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, delay: 1.3 }}
+                >
+                  {stats.ideasInProgress}
+                </motion.div>
+                
+                <div className="text-gray-300 text-sm font-medium">
+                  In Progress
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.3 }}
+                whileHover={{ scale: 1.05 }}
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group"
+              >
+                <motion.div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  style={{ backgroundColor: '#8B5CF6' }}
+                />
+                
+                <motion.div
+                  className="text-3xl mb-3"
+                  animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
+                >
+                  🎉
+                </motion.div>
+                
+                <motion.div 
+                  className="text-4xl font-bold mb-2"
+                  style={{ color: '#8B5CF6' }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, delay: 1.4 }}
+                >
+                  {stats.ideasImplemented}
+                </motion.div>
+                
+                <div className="text-gray-300 text-sm font-medium">
+                  Implemented
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </motion.section>
       </div>
+    </div>
+  );
+}
+
+// Loading Component
+function LoadingGate() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1E3D] to-[#7C3AED]">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center"
+      >
+        <motion.div
+          className="w-32 h-32 bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl"
+          animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+          transition={{ rotate: { duration: 3, repeat: Infinity, ease: "linear" }, scale: { duration: 2, repeat: Infinity } }}
+        >
+          <span className="text-5xl">🚀</span>
+        </motion.div>
+        <motion.h2 
+          className="text-2xl font-bold text-white mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          Preparing Your Dashboard...
+        </motion.h2>
+        <motion.div
+          className="w-48 h-1 bg-white/20 rounded-full mx-auto overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          <motion.div
+            className="h-full bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6]"
+            initial={{ x: "-100%" }}
+            animate={{ x: "100%" }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

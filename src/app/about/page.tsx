@@ -1,232 +1,286 @@
-export default function About() {
+"use client";
+
+import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+
+export default function AboutPage() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const stats = [
+    { number: '500+', label: 'Innovations Shared', icon: '💡' },
+    { number: '10K+', label: 'Community Votes', icon: '❤️' },
+    { number: '95%', label: 'Satisfaction Rate', icon: '⭐' },
+    { number: '24/7', label: 'Active Community', icon: '🌍' }
+  ];
+
+  const team = [
+    { name: 'Sumaya Abdirahman', role: 'Founder & CEO', emoji: '🚀', color: 'from-blue-500 to-cyan-500' },
+    { name: 'Sarah Chen', role: 'Product Lead', emoji: '🎨', color: 'from-purple-500 to-pink-500' },
+    { name: 'Marcus Rivera', role: 'Tech Architect', emoji: '⚡', color: 'from-green-500 to-emerald-500' },
+    { name: 'Elena Petrova', role: 'Community Manager', emoji: '👥', color: 'from-yellow-500 to-orange-500' }
+  ];
+
+  // Eduvos Social Media Links
+  const socialMedia = [
+    { name: 'Facebook', icon: '📘', url: 'https://facebook.com/eduvos', color: 'hover:bg-blue-500/20' },
+    { name: 'Twitter', icon: '🐦', url: 'https://twitter.com/eduvos', color: 'hover:bg-sky-500/20' },
+    { name: 'Instagram', icon: '📷', url: 'https://instagram.com/eduvos', color: 'hover:bg-pink-500/20' },
+    { name: 'LinkedIn', icon: '💼', url: 'https://linkedin.com/company/eduvos', color: 'hover:bg-blue-600/20' },
+    { name: 'YouTube', icon: '📺', url: 'https://youtube.com/eduvos', color: 'hover:bg-red-500/20' }
+  ];
+
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: '#111827', marginBottom: '1rem' }}>
-          About Eduvos Innovation Platform
-        </h1>
-        <p style={{ fontSize: '1.125rem', color: '#6b7280' }}>
-          Empowering innovation through collaboration and structured workflow management
-        </p>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0A1E3D] via-blue-900/60 to-purple-900/80" />
+      
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-20">
+        {isMounted && [...Array(20)].map((_, i) => (
+          <motion.div
+            key={`dot-${i}`}
+            className="absolute rounded-full bg-[#60A5FA]"
+            style={{
+              width: Math.random() * 6 + 2,
+              height: Math.random() * 6 + 2,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0.1, 0.4, 0.1],
+            }}
+            transition={{
+              duration: 5 + Math.random() * 4,
+              repeat: Infinity,
+              delay: Math.random() * 3,
+            }}
+          />
+        ))}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        {/* Mission Section */}
-        <div style={{
-          background: 'white',
-          borderRadius: '0.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          padding: '2rem'
-        }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#111827', marginBottom: '1rem' }}>
-            ?? Our Mission
-          </h2>
-          <p style={{ color: '#6b7280', lineHeight: '1.6', marginBottom: '1rem' }}>
-            The Eduvos Innovation Platform is designed to foster a culture of innovation by providing 
-            students and staff with a structured environment to submit, collaborate on, and implement 
-            creative ideas that drive positive change.
-          </p>
-          <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
-            We believe that great ideas can come from anywhere, and our platform ensures that every 
-            voice is heard and every innovation has the opportunity to grow from concept to reality.
-          </p>
-        </div>
-
-        {/* Features Section */}
-        <div style={{
-          background: 'white',
-          borderRadius: '0.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          padding: '2rem'
-        }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#111827', marginBottom: '1.5rem' }}>
-            ?? Key Features
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+      <div className="relative z-10 min-h-screen">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-glass m-6 mb-8"
+        >
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
             <div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                Idea Submission
-              </h3>
-              <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                Easily submit innovative ideas with detailed descriptions, tags, and attachments.
-              </p>
+              <motion.h1 
+                className="text-4xl font-bold text-white mb-2 font-playfair"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                About <span className="text-gradient">Our Mission</span>
+              </motion.h1>
+              <motion.p 
+                className="text-gray-300"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Empowering innovation through collaboration and community
+              </motion.p>
             </div>
-            <div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                Collaborative Voting
-              </h3>
-              <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                Community-driven voting system to identify the most promising ideas.
-              </p>
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                Workflow Management
-              </h3>
-              <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                Track ideas through structured stages from submission to implementation.
-              </p>
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                Real-time Collaboration
-              </h3>
-              <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                Comment and discuss ideas in real-time with other community members.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* How It Works */}
-        <div style={{
-          background: 'white',
-          borderRadius: '0.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          padding: '2rem'
-        }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#111827', marginBottom: '1.5rem' }}>
-            ?? How It Works
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-              <div style={{
-                background: '#2563eb',
-                color: 'white',
-                width: '2rem',
-                height: '2rem',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 'bold',
-                flexShrink: 0
-              }}>1</div>
-              <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                  Submit Your Idea
-                </h3>
-                <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
-                  Share your innovative idea with the community. Add a clear title, detailed description, 
-                  and relevant tags to help others understand your vision.
-                </p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-              <div style={{
-                background: '#2563eb',
-                color: 'white',
-                width: '2rem',
-                height: '2rem',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 'bold',
-                flexShrink: 0
-              }}>2</div>
-              <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                  Gather Feedback
-                </h3>
-                <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
-                  Receive votes and comments from the community. Collaborate with others to refine 
-                  and improve your idea through constructive feedback.
-                </p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-              <div style={{
-                background: '#2563eb',
-                color: 'white',
-                width: '2rem',
-                height: '2rem',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 'bold',
-                flexShrink: 0
-              }}>3</div>
-              <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                  Progress Through Workflow
-                </h3>
-                <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
-                  Watch your idea move through structured stages: Backlog ? Validated ? In Progress ? Implemented. 
-                  Managers and admins help guide promising ideas to completion.
-                </p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-              <div style={{
-                background: '#2563eb',
-                color: 'white',
-                width: '2rem',
-                height: '2rem',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 'bold',
-                flexShrink: 0
-              }}>4</div>
-              <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                  See Impact
-                </h3>
-                <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
-                  Track the implementation and impact of your ideas. Celebrate successful innovations 
-                  that make a real difference in our community.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Call to Action */}
-        <div style={{
-          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-          borderRadius: '0.5rem',
-          padding: '3rem 2rem',
-          textAlign: 'center',
-          color: 'white'
-        }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-            Ready to Make an Impact?
-          </h2>
-          <p style={{ marginBottom: '2rem', opacity: 0.9 }}>
-            Join our innovation community and start sharing your ideas today.
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a 
-              href="/ideas/new"
-              style={{
-                background: 'white',
-                color: '#2563eb',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '0.375rem',
-                textDecoration: 'none',
-                fontWeight: '600'
-              }}
+            
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex items-center gap-4 mt-4 md:mt-0"
             >
-              Submit Your First Idea
-            </a>
-            <a 
-              href="/ideas"
-              style={{
-                background: 'transparent',
-                color: 'white',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '0.375rem',
-                textDecoration: 'none',
-                fontWeight: '600',
-                border: '2px solid white'
-              }}
-            >
-              Browse Ideas
-            </a>
+              <Link 
+                href="/"
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white transition-all duration-300"
+              >
+                ← Back Home
+              </Link>
+            </motion.div>
           </div>
+        </motion.div>
+
+        <div className="container mx-auto px-6 pb-12">
+          {/* Hero Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="card-glass p-8 rounded-2xl mb-12 text-center"
+          >
+            <motion.div
+              className="text-8xl mb-6"
+              animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 6, repeat: Infinity }}
+            >
+              🌟
+            </motion.div>
+            <h2 className="text-4xl font-bold text-white mb-6">
+              Eduvos Innovation Platform
+            </h2>
+            <p className="text-gray-300 text-xl leading-relaxed max-w-3xl mx-auto mb-6">
+              Where ideas evolve into reality. Empowering students to transform creative ideas 
+              into tangible solutions through collaboration and innovation.
+            </p>
+            
+            {/* Social Media Links */}
+            <div className="flex justify-center gap-4 mt-6">
+              {socialMedia.map((social, index) => (
+                <motion.a
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.7 + index * 0.1 }}
+                  whileHover={{ scale: 1.2, y: -5 }}
+                  className={`w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl ${social.color} transition-all duration-300`}
+                >
+                  {social.icon}
+                </motion.a>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+          >
+            {stats.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 + index * 0.1 }}
+                whileHover={{ y: -5, scale: 1.02 }}
+                className="card-glass p-6 rounded-2xl text-center group"
+              >
+                <div className="text-3xl mb-3">{stat.icon}</div>
+                <div className="text-2xl font-bold text-white mb-1">{stat.number}</div>
+                <div className="text-gray-300 text-sm">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Our Story & Vision */}
+          <div className="grid lg:grid-cols-2 gap-8 mb-12">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.9 }}
+              className="card-glass p-8 rounded-2xl"
+            >
+              <div className="text-4xl mb-4">📖</div>
+              <h3 className="text-2xl font-bold text-white mb-4">Our Story</h3>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                In 2025, our founder Sumaya Abdirahman noticed something profound happening 
+                across Eduvos campuses - brilliant ideas were being born in lecture halls, 
+                discussed in student lounges, and dreamed up during late-night study sessions, 
+                but they rarely saw the light of day.
+              </p>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                Inspired by the incredible potential she witnessed in her fellow students, 
+                Sumaya envisioned a platform where every voice could be heard, where the quietest 
+                student could share their groundbreaking idea alongside the most outspoken innovator.
+              </p>
+              <p className="text-gray-300 leading-relaxed">
+                What started as a simple observation has grown into a vibrant ecosystem where 
+                students don't just learn - they create, innovate, and shape the future together.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.0 }}
+              className="card-glass p-8 rounded-2xl"
+            >
+              <div className="text-4xl mb-4">🎯</div>
+              <h3 className="text-2xl font-bold text-white mb-4">Our Vision</h3>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                We believe that education shouldn't just be about absorbing knowledge - 
+                it should be about creating it. Our vision is to transform every Eduvos 
+                student from a learner into an innovator, equipped not just with degrees 
+                but with real-world solutions.
+              </p>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                We're building a future where student ideas don't just get good grades - 
+                they get implemented. Where classroom projects become startup ventures, 
+                and academic assignments evolve into industry-changing innovations.
+              </p>
+              <p className="text-gray-300 leading-relaxed">
+                Through this platform, we're creating a new generation of African innovators 
+                who will solve local challenges with global impact, starting right here at Eduvos.
+              </p>
+            </motion.div>
+          </div>
+
+          {/* Team Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            className="card-glass p-8 rounded-2xl mb-12"
+          >
+            <h3 className="text-3xl font-bold text-white text-center mb-8">Meet Our Team</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {team.map((member, index) => (
+                <motion.div
+                  key={member.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2 + index * 0.1 }}
+                  whileHover={{ y: -5 }}
+                  className="text-center group"
+                >
+                  <div className={`w-20 h-20 bg-gradient-to-r ${member.color} rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    {member.emoji}
+                  </div>
+                  <h4 className="text-lg font-bold text-white mb-1">{member.name}</h4>
+                  <p className="text-gray-400 text-sm">{member.role}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Call to Action */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.3 }}
+            className="card-glass p-8 rounded-2xl text-center border border-[#60A5FA]/20"
+          >
+            <h3 className="text-2xl font-bold text-white mb-4">Join Our Innovation Journey</h3>
+            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+              Ready to share your ideas, support innovative projects, and be part of a community 
+              that's shaping the future? Your journey starts here.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/ideas"
+                className="px-6 py-3 bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+              >
+                Explore Ideas
+              </Link>
+              <Link
+                href="/support"
+                className="px-6 py-3 bg-white/10 border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-all duration-300"
+              >
+                Get Started Guide
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

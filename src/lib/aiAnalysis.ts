@@ -1,6 +1,3 @@
-﻿// src/lib/AIAnalysis.ts
-import type { AIAnalysis, AIScores } from '@/types';
-
 class AIAnalysisService {
   async analyzeIdea(title: string, description: string, tags: string[] = []): Promise<AIAnalysis> {
     await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 2000));
@@ -16,10 +13,9 @@ class AIAnalysisService {
     const innovation = this.calculateScore(content, 65, 35, !hasTechnicalTerms);
     const resources = this.calculateScore(content, 50, 40, hasResourceWords);
 
-    // Required new fields
-    const scalability = 50; 
-    const risk = 50; 
-    const value = 50; 
+    const scalability = 50;
+    const risk = 50;
+    const value = 50;
     const alignment = 50;
 
     const overall = Math.round((feasibility + impact + innovation + resources) / 4);
@@ -118,3 +114,23 @@ class AIAnalysisService {
 }
 
 export const aiAnalysisService = new AIAnalysisService();
+
+export type AIAnalysis = {
+  summary: string;
+  confidence: number;
+  feasibility: number;
+  impact: number;
+  innovation: number;
+  resources: number;
+  scalability: number;
+  risk: number;
+  value: number;
+  alignment: number;
+  estimatedCost: 'low' | 'medium' | 'high';
+  timeToImplement: 'quick' | 'medium' | 'long';
+  riskLevel: 'low' | 'medium' | 'high';
+  strengths: string[];
+  considerations: string[];
+  recommendations: string[];
+  generatedAt: Date;
+};
